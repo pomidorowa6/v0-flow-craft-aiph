@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { ThemeProvider } from "@/contexts/theme-context"
 import "./globals.css"
+
 import { Roboto_Slab as V0_Font_Roboto_Slab, Roboto_Mono as V0_Font_Roboto_Mono, Roboto as V0_Font_Roboto } from 'next/font/google'
 
 // Initialize fonts
