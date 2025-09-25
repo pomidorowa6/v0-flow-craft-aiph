@@ -95,7 +95,7 @@ export function EnhancedIssuesList({
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 border rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 border pb-4 rounded-none border-r-0 border-l-0 border-t-0">
         <div className="p-4 border-0 py-0 rounded-none border-none text-center">
           <div className="text-2xl font-bold">{issues.length}</div>
           <div className="text-muted-foreground font-normal text-xs">Total Issues</div>
