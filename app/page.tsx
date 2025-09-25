@@ -280,7 +280,7 @@ export default function TaskFlowApp() {
       />
 
       <div className={`transition-all duration-300 ${isSidebarExpanded ? "ml-60" : "ml-16"}`}>
-        <div className="p-4 min-h-screen">
+        <div className="p-4 min-h-screen pl-0 pb-4">
           <main className="bg-background rounded-xl shadow-lg border border-border h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
             <HeaderBar
               currentView={currentView}
@@ -293,7 +293,7 @@ export default function TaskFlowApp() {
               onMarkAllAsRead={markAllAsRead}
             />
 
-            <div className="flex-1 overflow-auto p-6">{renderCurrentView()}</div>
+            <div className="flex-1 overflow-auto p-6 px-4 py-4">{renderCurrentView()}</div>
           </main>
         </div>
       </div>

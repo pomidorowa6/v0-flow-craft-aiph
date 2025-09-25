@@ -96,9 +96,9 @@ export function Navigation({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex flex-col h-full">
-        <div className="flex items-center h-16 px-4">
+        <div className="flex items-center px-4 h-20">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-sm font-bold flex-shrink-0">
+            <div className="bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-sm font-bold flex-shrink-0 w-10 h-10">
               F
             </div>
             {shouldShowExpanded && (
@@ -108,7 +108,7 @@ export function Navigation({
         </div>
 
         <div className="flex-1 py-4">
-          <div className="space-y-1 px-2">
+          <div className="space-y-1 px-4">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = currentView === item.id

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Menu, X } from "lucide-react"
+import { SidebarIcon, X } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { NotificationBell } from "@/components/notification-bell"
 import type { ViewType, Notification } from "@/types"
@@ -39,10 +39,10 @@ export function HeaderBar({
   onMarkAllAsRead,
 }: HeaderBarProps) {
   return (
-    <header className="sticky top-0 z-30 h-16 bg-background/80 backdrop-blur-md border-b border-border/50 flex items-center justify-between px-6">
-      <div className="flex items-center space-x-4">
+    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 flex items-center justify-between w-auto px-2 h-10">
+      <div className="flex items-center space-x-2">
         <Button variant="ghost" size="sm" onClick={onToggleExpanded} className="p-2">
-          {isExpanded ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {isExpanded ? <X className="h-4 w-4" /> : <SidebarIcon className="h-4 w-4" />}
         </Button>
 
         <Separator orientation="vertical" className="h-6" />
@@ -50,7 +50,7 @@ export function HeaderBar({
         <h2 className="text-lg font-semibold text-foreground">{viewLabels[currentView]}</h2>
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center px-0 space-x-6">
         <NotificationBell
           notifications={notifications}
           onMarkAsRead={onMarkAsRead}
