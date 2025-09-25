@@ -154,6 +154,14 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
     return teamMatch && sprintMatch
   })
 
+  const filteredDependencyChains = dependencyChains.filter((chain) => {
+    const teamMatch = selectedTeam === "all" || chain.teams.some((team) => team.id === selectedTeam)
+    const sprintMatch = selectedSprint === "all" || chain.issues.some((issue) => issue.sprintId === selectedSprint)
+    return teamMatch && sprintMatch
+  })
+
+  const filteredCriticalChains = filteredDependencyChains.filter((chain) => chain.criticalPath)
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
@@ -288,11 +296,13 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
       </div>
 
       <Tabs defaultValue="dependencies" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="dependencies">Dependencies Map</TabsTrigger>
-          <TabsTrigger value="chains">Dependency Chains</TabsTrigger>
-          <TabsTrigger value="critical">Critical Path</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="dependencies">Dependencies Map</TabsTrigger>
+            <TabsTrigger value="chains">Dependency Chains</TabsTrigger>
+            <TabsTrigger value="critical">Critical Path</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="dependencies" className="space-y-4">
           <div className="space-y-4">
@@ -437,7 +447,7 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
 
         <TabsContent value="chains" className="space-y-4">
           <div className="space-y-4">
-            {dependencyChains.map((chain) => (
+            {filteredDependencyChains.map((chain) => (
               <Card key={chain.id} className={cn("border-l-4", getChainStatusColor(chain.status))}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -534,7 +544,7 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
               </Card>
             ))}
 
-            {dependencyChains.length === 0 && (
+            {filteredDependencyChains.length === 0 && (
               <div className="text-center py-8">
                 <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No dependency chains found.</p>
@@ -545,39 +555,37 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
 
         <TabsContent value="critical" className="space-y-4">
           <div className="space-y-4">
-            {dependencyChains
-              .filter((chain) => chain.criticalPath)
-              .map((chain) => (
-                <Card key={chain.id} className="border-l-4 border-l-red-500 bg-red-50/50">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg flex items-center space-x-2">
-                        <Target className="h-5 w-5 text-red-500" />
-                        <span>{chain.name}</span>
-                      </CardTitle>
-                      <Badge variant="destructive">Critical Path</Badge>
+            {filteredCriticalChains.map((chain) => (
+              <Card key={chain.id} className="border-l-4 border-l-red-500 bg-red-50/50">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center space-x-2">
+                      <Target className="h-5 w-5 text-red-500" />
+                      <span>{chain.name}</span>
+                    </CardTitle>
+                    <Badge variant="destructive">Critical Path</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{chain.issues.length}</div>
+                      <div className="text-xs text-muted-foreground">Issues in Chain</div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-red-600">{chain.issues.length}</div>
-                        <div className="text-xs text-muted-foreground">Issues in Chain</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-red-600">{chain.teams.length}</div>
-                        <div className="text-xs text-muted-foreground">Teams Involved</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-red-600">{chain.estimatedDuration}h</div>
-                        <div className="text-xs text-muted-foreground">Est. Duration</div>
-                      </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{chain.teams.length}</div>
+                      <div className="text-xs text-muted-foreground">Teams Involved</div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{chain.estimatedDuration}h</div>
+                      <div className="text-xs text-muted-foreground">Est. Duration</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
 
-            {dependencyChains.filter((chain) => chain.criticalPath).length === 0 && (
+            {filteredCriticalChains.length === 0 && (
               <div className="text-center py-8">
                 <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No critical path dependencies identified.</p>
