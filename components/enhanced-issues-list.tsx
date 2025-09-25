@@ -463,7 +463,7 @@ export function EnhancedIssuesList({
                   <TableCell>
                     {sprint ? (
                       <div>
-                        <CardSprintNumber>Sprint {sprint.number}</CardSprintNumber>
+                        <CardSprintNumber>{sprint.number}</CardSprintNumber>
                         <CardSprintTitle>{sprint.name}</CardSprintTitle>
                       </div>
                     ) : (
