@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CardSprintNumber, CardSprintTitle } from "@/components/ui/card"
 import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
 import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
@@ -463,8 +462,8 @@ export function EnhancedIssuesList({
                   <TableCell>
                     {sprint ? (
                       <div>
-                        <CardSprintNumber>{sprint.number}</CardSprintNumber>
-                        <CardSprintTitle>{sprint.name}</CardSprintTitle>
+                        {sprint.number}
+                        {sprint.name}
                       </div>
                     ) : (
                       "No Sprint"
