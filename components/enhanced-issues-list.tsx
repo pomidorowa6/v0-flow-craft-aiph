@@ -462,8 +462,8 @@ export function EnhancedIssuesList({
                   <TableCell>
                     {sprint ? (
                       <div>
-                        <div className="font-medium">{Sprint.No}</div>
-                        <div className="text-sm text-muted-foreground">{Sprint.name}<div>
+                        <div className="font-medium">{sprint.number}</div>
+                        <div className="text-sm text-muted-foreground">{sprint.name}</div>
                       </div>
                     ) : (
                       "No Sprint"
