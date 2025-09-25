@@ -16,7 +16,9 @@ export interface Issue {
 
 export interface Sprint {
   id: string
-  name: string
+  no: string | number
+  title: string
+  name: string // keeping for backward compatibility
   status: SprintStatus
   startDate: Date
   endDate: Date

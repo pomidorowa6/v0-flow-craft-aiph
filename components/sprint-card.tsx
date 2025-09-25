@@ -51,8 +51,9 @@ export function SprintCard({ sprint, issues, onEdit, onStart, onEnd, canStart }:
               <Badge className={getStatusColor()} variant="outline">
                 {sprint.status}
               </Badge>
-              <h3 className="font-medium">{sprint.name}</h3>
-              
+              <h3 className="font-medium">
+                Sprint {sprint.no} - {sprint.title}
+              </h3>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
