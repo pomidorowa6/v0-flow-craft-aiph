@@ -19,7 +19,7 @@ interface HeaderBarProps {
 }
 
 const viewLabels: Record<ViewType, string> = {
-  issues: "Issues",
+  issues: "Backlog",
   "current-sprint": "Current Sprint",
   sprints: "Sprints",
   management: "Management Dashboard",

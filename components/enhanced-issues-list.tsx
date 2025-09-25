@@ -4,11 +4,10 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Filter, LayoutGrid, List } from "lucide-react"
-import { EnhancedIssueCard } from "./enhanced-issue-card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
 import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
 
@@ -38,7 +37,9 @@ export function EnhancedIssuesList({
   const [teamFilter, setTeamFilter] = useState<string>("all")
   const [sortBy, setSortBy] = useState<"priority" | "businessImpact" | "created" | "updated">("priority")
   const [showBlockedOnly, setShowBlockedOnly] = useState(false)
-  const [viewMode, setViewMode] = useState<"tiles" | "list">("tiles")
+  const [selectedIssues, setSelectedIssues] = useState<Set<string>>(new Set())
+  const [bulkSprintId, setBulkSprintId] = useState<string>("")
+  const [bulkAssigneeId, setBulkAssigneeId] = useState<string>("")
 
   const filteredAndSortedIssues = issues
     .filter((issue) => {
@@ -76,6 +77,53 @@ export function EnhancedIssuesList({
     (issue) => issue.businessImpact === "Critical" || issue.businessImpact === "High",
   ).length
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIssues(new Set(filteredAndSortedIssues.map((issue) => issue.id)))
+    } else {
+      setSelectedIssues(new Set())
+    }
+  }
+
+  const handleSelectIssue = (issueId: string, checked: boolean) => {
+    const newSelected = new Set(selectedIssues)
+    if (checked) {
+      newSelected.add(issueId)
+    } else {
+      newSelected.delete(issueId)
+    }
+    setSelectedIssues(newSelected)
+  }
+
+  const handleBulkDelete = () => {
+    selectedIssues.forEach((issueId) => onDeleteIssue(issueId))
+    setSelectedIssues(new Set())
+  }
+
+  const handleBulkAssignSprint = () => {
+    if (!bulkSprintId) return
+    selectedIssues.forEach((issueId) => {
+      const issue = issues.find((i) => i.id === issueId)
+      if (issue) {
+        onEditIssue({ ...issue, sprintId: bulkSprintId })
+      }
+    })
+    setSelectedIssues(new Set())
+    setBulkSprintId("")
+  }
+
+  const handleBulkAssignPerson = () => {
+    if (!bulkAssigneeId) return
+    selectedIssues.forEach((issueId) => {
+      const issue = issues.find((i) => i.id === issueId)
+      if (issue) {
+        onEditIssue({ ...issue, assigneeId: bulkAssigneeId })
+      }
+    })
+    setSelectedIssues(new Set())
+    setBulkAssigneeId("")
+  }
+
   const getPriorityColor = (priority: Priority) => {
     switch (priority) {
       case "P0":
@@ -110,38 +158,30 @@ export function EnhancedIssuesList({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Enhanced Issues</h2>
-          <p className="text-muted-foreground">Manage issues with business context and dependencies</p>
-        </div>
-      </div>
-
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 border pb-4 rounded-none border-r-0 border-l-0 border-t-0">
-        <div className="p-4 border-0 py-0 rounded-none border-none text-center">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-4 border-b">
+        <div className="text-center">
           <div className="text-2xl font-bold">{issues.length}</div>
-          <div className="text-muted-foreground font-normal text-xs">Total Issues</div>
+          <div className="text-muted-foreground text-sm">Total Issues</div>
         </div>
-        <div className="p-4 rounded-lg border-0 py-0 border-none text-center">
+        <div className="text-center">
           <div className="text-2xl font-bold text-red-600">{blockedIssuesCount}</div>
-          <div className="text-muted-foreground text-xs">Blocked Issues</div>
+          <div className="text-muted-foreground text-sm">Blocked Issues</div>
         </div>
-        <div className="p-4 rounded-lg py-0 border-0 border-none text-center">
+        <div className="text-center">
           <div className="text-2xl font-bold text-orange-600">{highImpactCount}</div>
-          <div className="text-muted-foreground text-xs">High Impact</div>
+          <div className="text-muted-foreground text-sm">High Impact</div>
         </div>
-        <div className="p-4 py-0 border-0 border-none text-center">
+        <div className="text-center">
           <div className="text-2xl font-bold text-green-600">
             {issues.filter((issue) => issue.status === "Done").length}
           </div>
-          <div className="text-muted-foreground text-xs">Completed</div>
+          <div className="text-muted-foreground text-sm">Completed</div>
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between space-x-4">
+      <div className="border rounded-lg">
+        {/* Search and Actions Row */}
+        <div className="flex items-center justify-between p-4 border-b bg-muted/30">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -166,19 +206,11 @@ export function EnhancedIssuesList({
                 </Button>
               }
             />
-
-            <div className="flex items-center space-x-2">
-              <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-              <Switch
-                checked={viewMode === "list"}
-                onCheckedChange={(checked) => setViewMode(checked ? "list" : "tiles")}
-              />
-              <List className="h-4 w-4 text-muted-foreground" />
-            </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Filters Row */}
+        <div className="flex flex-wrap items-center gap-2 p-4 border-b bg-muted/20">
           <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Status" />
@@ -257,89 +289,147 @@ export function EnhancedIssuesList({
             onClick={() => setShowBlockedOnly(!showBlockedOnly)}
             className="h-10"
           >
-            <Filter className="h-4 w-4 mr-2" />
             Blocked Only
           </Button>
         </div>
+
+        {selectedIssues.size > 0 && (
+          <div className="flex items-center justify-between p-4 border-b bg-blue-50 dark:bg-blue-950/20">
+            <span className="text-sm font-medium">
+              {selectedIssues.size} issue{selectedIssues.size !== 1 ? "s" : ""} selected
+            </span>
+            <div className="flex items-center space-x-2">
+              <Select value={bulkSprintId} onValueChange={setBulkSprintId}>
+                <SelectTrigger className="w-40 h-8">
+                  <SelectValue placeholder="Assign to Sprint" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sprints.map((sprint) => (
+                    <SelectItem key={sprint.id} value={sprint.id}>
+                      {sprint.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={handleBulkAssignSprint} disabled={!bulkSprintId}>
+                <Calendar className="h-3 w-3 mr-1" />
+                Assign Sprint
+              </Button>
+
+              <Select value={bulkAssigneeId} onValueChange={setBulkAssigneeId}>
+                <SelectTrigger className="w-40 h-8">
+                  <SelectValue placeholder="Assign to Person" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teamMembers.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={handleBulkAssignPerson} disabled={!bulkAssigneeId}>
+                <Users className="h-3 w-3 mr-1" />
+                Assign Person
+              </Button>
+
+              <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
+                <Trash2 className="h-3 w-3 mr-1" />
+                Delete Selected
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead>Issue</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Business Impact</TableHead>
+              <TableHead>Team</TableHead>
+              <TableHead>Assignee</TableHead>
+              <TableHead>Sprint</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="w-20">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAndSortedIssues.map((issue) => {
+              const team = teams.find((t) => t.id === issue.teamId)
+              const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
+              const sprint = sprints.find((s) => s.id === issue.sprintId)
+
+              return (
+                <TableRow key={issue.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIssues.has(issue.id)}
+                      onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{issue.title}</div>
+                      <div className="text-sm text-muted-foreground">{issue.id}</div>
+                      {issue.blockedReason && (
+                        <Badge variant="destructive" className="mt-1">
+                          Blocked
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getPriorityColor(issue.priority)}>{issue.priority}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{issue.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
+                  </TableCell>
+                  <TableCell>{team?.name || "Unassigned"}</TableCell>
+                  <TableCell>{assignee?.name || "Unassigned"}</TableCell>
+                  <TableCell>{sprint?.name || "No Sprint"}</TableCell>
+                  <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-1">
+                      <EnhancedIssueForm
+                        issue={issue}
+                        sprints={sprints}
+                        teams={teams}
+                        teamMembers={teamMembers}
+                        onSubmit={onEditIssue}
+                        onCancel={() => {}}
+                        trigger={
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                        }
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        onClick={() => onDeleteIssue(issue.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
-
-      {viewMode === "tiles" ? (
-        /* Issues Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAndSortedIssues.map((issue) => (
-            <EnhancedIssueCard
-              key={issue.id}
-              issue={issue}
-              sprints={sprints}
-              teamMembers={teamMembers}
-              onEdit={onEditIssue}
-              onDelete={onDeleteIssue}
-            />
-          ))}
-        </div>
-      ) : (
-        /* Issues Table */
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Issue</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Business Impact</TableHead>
-                <TableHead>Team</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedIssues.map((issue) => {
-                const team = teams.find((t) => t.id === issue.teamId)
-                const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
-
-                return (
-                  <TableRow key={issue.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{issue.title}</div>
-                        <div className="text-sm text-muted-foreground">{issue.id}</div>
-                        {issue.blockedReason && (
-                          <Badge variant="destructive" className="mt-1">
-                            Blocked
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityColor(issue.priority)}>{issue.priority}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{issue.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
-                    </TableCell>
-                    <TableCell>{team?.name || "Unassigned"}</TableCell>
-                    <TableCell>{assignee?.name || "Unassigned"}</TableCell>
-                    <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => onEditIssue(issue)}>
-                          Edit
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => onDeleteIssue(issue.id)}>
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      )}
 
       {filteredAndSortedIssues.length === 0 && (
         <div className="text-center py-8">

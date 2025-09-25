@@ -40,7 +40,7 @@ export function Navigation({
   const navItems = [
     {
       id: "issues" as ViewType,
-      label: "Issues",
+      label: "Backlog",
       icon: List,
       count: issues.length,
     },
