@@ -90,7 +90,7 @@ export function Navigation({
     <nav
       className={cn(
         "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out",
-        shouldShowExpanded ? "w-72" : "w-16",
+        shouldShowExpanded ? "w-70" : "w-16",
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
