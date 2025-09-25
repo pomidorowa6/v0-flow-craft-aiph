@@ -264,7 +264,7 @@ export default function TaskFlowApp() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
       <Navigation
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -278,15 +278,22 @@ export default function TaskFlowApp() {
         isExpanded={isSidebarExpanded}
         onToggleExpanded={() => setIsSidebarExpanded(!isSidebarExpanded)}
       />
+
       <div className={`transition-all duration-300 ${isSidebarExpanded ? "ml-60" : "ml-16"}`}>
-        <HeaderBar
-          currentView={currentView}
-          isExpanded={isSidebarExpanded}
-          onToggleExpanded={() => setIsSidebarExpanded(!isSidebarExpanded)}
-        />
-        <div className="p-6">
-          <main className="bg-card rounded-xl shadow-lg border border-border p-6 min-h-[calc(100vh-8rem)]">
-            {renderCurrentView()}
+        <div className="p-4 min-h-screen">
+          <main className="bg-background rounded-xl shadow-lg border border-border h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
+            <HeaderBar
+              currentView={currentView}
+              isExpanded={isSidebarExpanded}
+              onToggleExpanded={() => setIsSidebarExpanded(!isSidebarExpanded)}
+              notifications={notifications}
+              onMarkAsRead={markAsRead}
+              onMarkAsUnread={markAsUnread}
+              onDismiss={dismiss}
+              onMarkAllAsRead={markAllAsRead}
+            />
+
+            <div className="flex-1 overflow-auto p-6">{renderCurrentView()}</div>
           </main>
         </div>
       </div>

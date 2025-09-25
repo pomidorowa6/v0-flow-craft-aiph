@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { List, Kanban, Calendar, BarChart3, Users, GitBranch, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { NotificationBell } from "@/components/notification-bell"
 import type { ViewType, Issue, Sprint, Notification } from "@/types"
 
 interface NavigationProps {
@@ -88,88 +87,81 @@ export function Navigation({
   const shouldShowExpanded = isExpanded || isHovered
 
   return (
-    <>
-      {shouldShowExpanded && <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={onToggleExpanded} />}
-
-      <nav
-        className={cn(
-          "fixed left-0 top-0 h-full bg-background border-r border-border z-50 transition-all duration-300 ease-in-out",
-          shouldShowExpanded ? "w-60" : "w-16",
-        )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center h-16 px-4 border-b border-border">
-            <div className="flex items-center space-x-3">
-              <img src="/flowcraft-logo.png" alt="FlowCraft Logo" className="w-8 h-8 flex-shrink-0" />
-              {shouldShowExpanded && <h1 className="text-lg font-semibold whitespace-nowrap">FlowCraft</h1>}
+    <nav
+      className={cn(
+        "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out",
+        shouldShowExpanded ? "w-60" : "w-16",
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="flex flex-col h-full">
+        <div className="flex items-center h-16 px-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-sm font-bold flex-shrink-0">
+              F
             </div>
-          </div>
-
-          <div className="flex-1 py-4">
-            <div className="space-y-1 px-2">
-              {navItems.map((item) => {
-                const Icon = item.icon
-                const isActive = currentView === item.id
-                const isDisabled = item.disabled
-
-                return (
-                  <Button
-                    key={item.id}
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="sm"
-                    onClick={() => !isDisabled && onViewChange(item.id)}
-                    disabled={isDisabled}
-                    className={cn(
-                      "w-full justify-start h-10 px-3",
-                      isActive && "bg-secondary text-secondary-foreground",
-                      isDisabled && "opacity-50 cursor-not-allowed",
-                      !shouldShowExpanded && "px-3 justify-center",
-                    )}
-                  >
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    {shouldShowExpanded && (
-                      <>
-                        <span className="ml-3 truncate">{item.label}</span>
-                        <Badge variant="outline" className="ml-auto text-xs">
-                          {item.count}
-                        </Badge>
-                      </>
-                    )}
-                  </Button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="border-t border-border p-2">
-            <div className="flex flex-col space-y-2">
-              <div className={cn("flex", shouldShowExpanded ? "justify-start" : "justify-center")}>
-                <NotificationBell
-                  notifications={notifications}
-                  onMarkAsRead={onMarkAsRead}
-                  onMarkAsUnread={onMarkAsUnread}
-                  onDismiss={onDismiss}
-                  onMarkAllAsRead={onMarkAllAsRead}
-                />
-              </div>
-
-              <div
-                className={cn(
-                  "flex items-center space-x-3 p-2 rounded-lg hover:bg-accent cursor-pointer",
-                  !shouldShowExpanded && "justify-center",
-                )}
-              >
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0">
-                  U
-                </div>
-                {shouldShowExpanded && <span className="text-sm font-medium truncate">User</span>}
-              </div>
-            </div>
+            {shouldShowExpanded && (
+              <h1 className="text-lg font-semibold whitespace-nowrap text-foreground">FlowCraft</h1>
+            )}
           </div>
         </div>
-      </nav>
-    </>
+
+        <div className="flex-1 py-4">
+          <div className="space-y-1 px-2">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const isActive = currentView === item.id
+              const isDisabled = item.disabled
+
+              return (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => !isDisabled && onViewChange(item.id)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "w-full justify-start h-10 px-3 text-muted-foreground hover:text-foreground hover:bg-accent/50",
+                    isActive && "bg-accent text-foreground",
+                    isDisabled && "opacity-50 cursor-not-allowed",
+                    !shouldShowExpanded && "px-3 justify-center",
+                  )}
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  {shouldShowExpanded && (
+                    <>
+                      <span className="ml-3 truncate">{item.label}</span>
+                      <Badge variant="secondary" className="ml-auto text-xs">
+                        {item.count}
+                      </Badge>
+                    </>
+                  )}
+                </Button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="p-4">
+          <div
+            className={cn(
+              "flex items-center space-x-3 p-2 rounded-lg hover:bg-accent/50 cursor-pointer",
+              !shouldShowExpanded && "justify-center",
+            )}
+          >
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0">
+              JD
+            </div>
+            {shouldShowExpanded && (
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-medium truncate text-foreground">John Doe</span>
+                <span className="text-xs text-muted-foreground truncate">john.doe@xyz.com</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
   )
 }
