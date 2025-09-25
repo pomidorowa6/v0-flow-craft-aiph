@@ -3,17 +3,16 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { CardSprintNumber, CardSprintTitle } from "@/components/ui/card"
 import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
 import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 interface EnhancedIssuesListProps {
   issues: EnhancedIssue[]
@@ -82,36 +81,6 @@ export function EnhancedIssuesList({
   const highImpactCount = issues.filter(
     (issue) => issue.businessImpact === "Critical" || issue.businessImpact === "High",
   ).length
-  const completedCount = issues.filter((issue) => issue.status === "Done").length
-
-  const chartData = [
-    { category: "total", count: issues.length, fill: "hsl(var(--chart-1) / 0.5)" },
-    { category: "blocked", count: blockedIssuesCount, fill: "hsl(var(--chart-2) / 0.5)" },
-    { category: "highImpact", count: highImpactCount, fill: "hsl(var(--chart-3) / 0.5)" },
-    { category: "completed", count: completedCount, fill: "hsl(var(--chart-4) / 0.5)" },
-  ]
-
-  const chartConfig = {
-    count: {
-      label: "Count",
-    },
-    total: {
-      label: "Total Issues",
-      color: "hsl(var(--chart-1))",
-    },
-    blocked: {
-      label: "Blocked Issues",
-      color: "hsl(var(--chart-2))",
-    },
-    highImpact: {
-      label: "High Impact",
-      color: "hsl(var(--chart-3))",
-    },
-    completed: {
-      label: "Completed",
-      color: "hsl(var(--chart-4))",
-    },
-  } satisfies ChartConfig
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -196,54 +165,40 @@ export function EnhancedIssuesList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4 py-4 border-b border-none">
-        <div className="flex-1">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Issues Overview</CardTitle>
-              <CardDescription>Current status of all issues</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[200px]">
-                <BarChart
-                  accessibilityLayer
-                  data={chartData}
-                  layout="vertical"
-                  margin={{
-                    left: 0,
-                  }}
-                >
-                  <YAxis
-                    dataKey="category"
-                    type="category"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => chartConfig[value as keyof typeof chartConfig]?.label}
-                  />
-                  <XAxis dataKey="count" type="number" hide />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                  <Bar dataKey="count" layout="vertical" radius={5} />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-5 py-4 border-b border-none">
+        <div className="text-center">
+          <div className="text-2xl font-bold">{issues.length}</div>
+          <div className="text-muted-foreground text-sm">Total Issues</div>
         </div>
-        <div className="flex-shrink-0">
-          <EnhancedIssueForm
-            sprints={sprints}
-            teams={teams}
-            teamMembers={teamMembers}
-            onSubmit={onCreateIssue}
-            onCancel={() => {}}
-            trigger={
-              <Button size="lg">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Issue
-              </Button>
-            }
-          />
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-600">{blockedIssuesCount}</div>
+          <div className="text-muted-foreground text-sm">Blocked Issues</div>
         </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-600">{highImpactCount}</div>
+          <div className="text-muted-foreground text-sm">High Impact</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600">
+            {issues.filter((issue) => issue.status === "Done").length}
+          </div>
+          <div className="text-muted-foreground text-sm">Completed</div>
+        </div>
+        <div className="flex items-center space-x-2 text-right flex-row justify-end">
+            <EnhancedIssueForm
+              sprints={sprints}
+              teams={teams}
+              teamMembers={teamMembers}
+              onSubmit={onCreateIssue}
+              onCancel={() => {}}
+              trigger={
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Issue
+                </Button>
+              }
+            />
+          </div>
       </div>
 
       <div className="border rounded-lg">
@@ -257,6 +212,90 @@ export function EnhancedIssuesList({
               className="pl-10"
             />
           </div>
+          
+        </div>
+
+        <div className="flex flex-wrap items-center p-4 border-b bg-muted/20 justify-stretch gap-2">
+          <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Todo">Todo</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+              <SelectItem value="In Review">In Review</SelectItem>
+              <SelectItem value="Done">Done</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Priority</SelectItem>
+              <SelectItem value="P0">P0 - Critical</SelectItem>
+              <SelectItem value="P1">P1 - High</SelectItem>
+              <SelectItem value="P2">P2 - Medium</SelectItem>
+              <SelectItem value="P3">P3 - Low</SelectItem>
+              <SelectItem value="P4">P4 - Lowest</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={businessImpactFilter}
+            onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
+          >
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Business Impact" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Impact</SelectItem>
+              <SelectItem value="Critical">Critical</SelectItem>
+              <SelectItem value="High">High</SelectItem>
+              <SelectItem value="Medium">Medium</SelectItem>
+              <SelectItem value="Low">Low</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={teamFilter} onValueChange={setTeamFilter}>
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Team" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Teams</SelectItem>
+              {teams.map((team) => (
+                <SelectItem key={team.id} value={team.id}>
+                  {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={sortBy}
+            onValueChange={(value: "priority" | "businessImpact" | "created" | "updated") => setSortBy(value)}
+          >
+            <SelectTrigger className="w-40 h-10">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="priority">Priority</SelectItem>
+              <SelectItem value="businessImpact">Business Impact</SelectItem>
+              <SelectItem value="created">Created Date</SelectItem>
+              <SelectItem value="updated">Updated Date</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant={showBlockedOnly ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowBlockedOnly(!showBlockedOnly)}
+            className="h-10"
+          >
+            Blocked Only
+          </Button>
         </div>
 
         {selectedIssues.size > 0 && (
