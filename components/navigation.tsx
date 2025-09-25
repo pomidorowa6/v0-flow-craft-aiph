@@ -160,7 +160,7 @@ export function Navigation({
                 !isExpanded && "justify-center",
               )}
             >
-              <div className="w-8 h-8 bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0 rounded-lg text-left">
+              <div className="w-8 h-8 bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0 text-left rounded-md">
                 JD
               </div>
               {isExpanded && (
