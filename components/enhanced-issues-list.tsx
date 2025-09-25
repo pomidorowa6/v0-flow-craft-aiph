@@ -464,7 +464,7 @@ export function EnhancedIssuesList({
                     {sprint ? (
                       <div>
                         {console.log("[v0] Sprint data:", sprint)}
-                        <div className="font-medium">{sprint.No}</div>
+                        <div className="font-medium">{sprint.no}</div>
                       <div className="text-sm text-muted-foreground">{sprint.title}</div>
                       </div>
                     ) : (
