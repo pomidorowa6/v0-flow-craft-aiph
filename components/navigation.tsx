@@ -88,7 +88,7 @@ export function Navigation({
       <nav
         className={cn(
           "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out",
-          isExpanded ? "w-fit min-w-[240px]" : "w-fit",
+          isExpanded ? "w-64" : "w-16",
         )}
       >
         <div className="flex flex-col h-full">
