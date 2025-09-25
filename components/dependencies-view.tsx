@@ -302,6 +302,37 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
             <TabsTrigger value="chains">Dependency Chains</TabsTrigger>
             <TabsTrigger value="critical">Critical Path</TabsTrigger>
           </TabsList>
+          <div className="flex items-center space-x-4">
+            <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select team" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Teams</SelectItem>
+                {teams.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: team.color }} />
+                      <span>{team.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedSprint} onValueChange={setSelectedSprint}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select sprint" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sprints</SelectItem>
+                {sprints.map((sprint) => (
+                  <SelectItem key={sprint.id} value={sprint.id}>
+                    {sprint.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <TabsContent value="dependencies" className="space-y-4">
