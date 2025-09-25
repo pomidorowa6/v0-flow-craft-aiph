@@ -421,7 +421,14 @@ export function EnhancedIssueForm({
 
       {/* Actions */}
       <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            onCancel()
+            setIsOpen(false)
+          }}
+        >
           Cancel
         </Button>
         <Button type="submit">{issue ? "Update Issue" : "Create Issue"}</Button>
