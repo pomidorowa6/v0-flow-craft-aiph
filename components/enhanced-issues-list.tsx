@@ -95,24 +95,24 @@ export function EnhancedIssuesList({
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-4 border rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 border rounded-lg">
+        <div className="p-4 border-0 py-0 rounded-none border-none text-center">
           <div className="text-2xl font-bold">{issues.length}</div>
-          <div className="text-sm text-muted-foreground">Total Issues</div>
+          <div className="text-muted-foreground font-normal text-xs">Total Issues</div>
         </div>
-        <div className="p-4 border rounded-lg">
+        <div className="p-4 rounded-lg border-0 py-0 border-none text-center">
           <div className="text-2xl font-bold text-red-600">{blockedIssuesCount}</div>
-          <div className="text-sm text-muted-foreground">Blocked Issues</div>
+          <div className="text-muted-foreground text-xs">Blocked Issues</div>
         </div>
-        <div className="p-4 border rounded-lg">
+        <div className="p-4 rounded-lg py-0 border-0 border-none text-center">
           <div className="text-2xl font-bold text-orange-600">{highImpactCount}</div>
-          <div className="text-sm text-muted-foreground">High Impact</div>
+          <div className="text-muted-foreground text-xs">High Impact</div>
         </div>
-        <div className="p-4 border rounded-lg">
+        <div className="p-4 py-0 border-0 border-none text-center">
           <div className="text-2xl font-bold text-green-600">
             {issues.filter((issue) => issue.status === "Done").length}
           </div>
-          <div className="text-sm text-muted-foreground">Completed</div>
+          <div className="text-muted-foreground text-xs">Completed</div>
         </div>
       </div>
 
