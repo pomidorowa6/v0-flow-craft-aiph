@@ -383,7 +383,7 @@ export default function AdvancedAnalytics() {
 
         {/* Team Health Tab */}
         <TabsContent value="health" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredMetrics.map((team) => (
               <Card key={team.id}>
                 <CardHeader>
