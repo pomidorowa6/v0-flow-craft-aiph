@@ -178,30 +178,27 @@ export function EnhancedIssuesList({
           <div className="text-muted-foreground text-sm">Completed</div>
         </div>
         <div className="flex items-center space-x-3">
-            <EnhancedIssueForm
-              sprints={sprints}
-              teams={teams}
-              teamMembers={teamMembers}
-              onSubmit={onCreateIssue}
-              onCancel={() => {}}
-              trigger={
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Issue
-                </Button>
-              }
-            />
-          </div>
-        
+          <EnhancedIssueForm
+            sprints={sprints}
+            teams={teams}
+            teamMembers={teamMembers}
+            onSubmit={onCreateIssue}
+            onCancel={() => {}}
+            trigger={
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Issue
+              </Button>
+            }
+          />
+        </div>
       </div>
 
       <div className="border rounded-lg">
         {/* Search and Actions Row */}
-        
 
         {/* Filters Row */}
         <div className="flex flex-wrap items-center p-4 border-b bg-muted/20 justify-stretch gap-2">
-
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -210,7 +207,7 @@ export function EnhancedIssuesList({
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
-          </div> 
+          </div>
           <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Status" />
@@ -354,8 +351,7 @@ export function EnhancedIssuesList({
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Business Impact</TableHead>
-              <TableHead>Team</TableHead>
-              <TableHead>Assignee</TableHead>
+              <TableHead>Team/Assignee</TableHead>
               <TableHead>Sprint</TableHead>
               <TableHead>Created</TableHead>
               <TableHead className="w-20">Actions</TableHead>
@@ -395,8 +391,12 @@ export function EnhancedIssuesList({
                   <TableCell>
                     <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
                   </TableCell>
-                  <TableCell>{team?.name || "Unassigned"}</TableCell>
-                  <TableCell>{assignee?.name || "Unassigned"}</TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{team?.name || "Unassigned"}</div>
+                      <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
+                    </div>
+                  </TableCell>
                   <TableCell>{sprint?.name || "No Sprint"}</TableCell>
                   <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
