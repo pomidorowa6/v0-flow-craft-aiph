@@ -157,8 +157,8 @@ export function EnhancedIssuesList({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-4 border-b">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-4 border-b border-none">
         <div className="text-center">
           <div className="text-2xl font-bold">{issues.length}</div>
           <div className="text-muted-foreground text-sm">Total Issues</div>
@@ -181,7 +181,7 @@ export function EnhancedIssuesList({
 
       <div className="border rounded-lg">
         {/* Search and Actions Row */}
-        <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+        <div className="flex items-center justify-between p-4 border-b bg-muted/30 border-none pb-0">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -210,7 +210,7 @@ export function EnhancedIssuesList({
         </div>
 
         {/* Filters Row */}
-        <div className="flex flex-wrap items-center gap-2 p-4 border-b bg-muted/20">
+        <div className="flex flex-wrap items-center gap-2 p-4 border-b bg-muted/20 justify-stretch">
           <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Status" />
