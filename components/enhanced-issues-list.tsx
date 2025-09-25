@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
 import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
@@ -38,8 +40,10 @@ export function EnhancedIssuesList({
   const [sortBy, setSortBy] = useState<"priority" | "businessImpact" | "created" | "updated">("priority")
   const [showBlockedOnly, setShowBlockedOnly] = useState(false)
   const [selectedIssues, setSelectedIssues] = useState<Set<string>>(new Set())
-  const [bulkSprintId, setBulkSprintId] = useState<string>("")
-  const [bulkAssigneeId, setBulkAssigneeId] = useState<string>("")
+  const [assignSprintModalOpen, setAssignSprintModalOpen] = useState(false)
+  const [assignPersonModalOpen, setAssignPersonModalOpen] = useState(false)
+  const [selectedSprintId, setSelectedSprintId] = useState<string>("")
+  const [selectedPersonId, setSelectedPersonId] = useState<string>("")
 
   const filteredAndSortedIssues = issues
     .filter((issue) => {
@@ -101,27 +105,29 @@ export function EnhancedIssuesList({
   }
 
   const handleBulkAssignSprint = () => {
-    if (!bulkSprintId) return
+    if (!selectedSprintId) return
     selectedIssues.forEach((issueId) => {
       const issue = issues.find((i) => i.id === issueId)
       if (issue) {
-        onEditIssue({ ...issue, sprintId: bulkSprintId })
+        onEditIssue({ ...issue, sprintId: selectedSprintId })
       }
     })
     setSelectedIssues(new Set())
-    setBulkSprintId("")
+    setSelectedSprintId("")
+    setAssignSprintModalOpen(false)
   }
 
   const handleBulkAssignPerson = () => {
-    if (!bulkAssigneeId) return
+    if (!selectedPersonId) return
     selectedIssues.forEach((issueId) => {
       const issue = issues.find((i) => i.id === issueId)
       if (issue) {
-        onEditIssue({ ...issue, assigneeId: bulkAssigneeId })
+        onEditIssue({ ...issue, assigneeId: selectedPersonId })
       }
     })
     setSelectedIssues(new Set())
-    setBulkAssigneeId("")
+    setSelectedPersonId("")
+    setAssignPersonModalOpen(false)
   }
 
   const getPriorityColor = (priority: Priority) => {
@@ -177,29 +183,11 @@ export function EnhancedIssuesList({
           </div>
           <div className="text-muted-foreground text-sm">Completed</div>
         </div>
-        <div className="flex items-center space-x-3">
-          <EnhancedIssueForm
-            sprints={sprints}
-            teams={teams}
-            teamMembers={teamMembers}
-            onSubmit={onCreateIssue}
-            onCancel={() => {}}
-            trigger={
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Issue
-              </Button>
-            }
-          />
-        </div>
       </div>
 
       <div className="border rounded-lg">
-        {/* Search and Actions Row */}
-
-        {/* Filters Row */}
-        <div className="flex flex-wrap items-center p-4 border-b bg-muted/20 justify-stretch gap-2">
-          <div className="relative flex-1 max-w-sm">
+        <div className="flex items-center justify-between p-4 border-b bg-muted/20">
+          <div className="relative flex-1 mr-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search issues..."
@@ -208,6 +196,24 @@ export function EnhancedIssuesList({
               className="pl-10"
             />
           </div>
+          <div className="flex items-center space-x-2">
+            <EnhancedIssueForm
+              sprints={sprints}
+              teams={teams}
+              teamMembers={teamMembers}
+              onSubmit={onCreateIssue}
+              onCancel={() => {}}
+              trigger={
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Issue
+                </Button>
+              }
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center p-4 border-b bg-muted/20 justify-stretch gap-2">
           <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Status" />
@@ -291,48 +297,104 @@ export function EnhancedIssuesList({
         </div>
 
         {selectedIssues.size > 0 && (
-          <div className="flex items-center justify-between p-4 border-b bg-blue-50 dark:bg-blue-950/20">
-            <span className="text-sm font-medium">
+          <div className="flex items-center justify-between px-4 py-2 border-b bg-primary/10 dark:bg-primary/20">
+            <span className="text-sm font-medium text-foreground">
               {selectedIssues.size} issue{selectedIssues.size !== 1 ? "s" : ""} selected
             </span>
             <div className="flex items-center space-x-2">
-              <Select value={bulkSprintId} onValueChange={setBulkSprintId}>
-                <SelectTrigger className="w-40 h-8">
-                  <SelectValue placeholder="Assign to Sprint" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sprints.map((sprint) => (
-                    <SelectItem key={sprint.id} value={sprint.id}>
-                      {sprint.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button size="sm" onClick={handleBulkAssignSprint} disabled={!bulkSprintId}>
-                <Calendar className="h-3 w-3 mr-1" />
-                Assign Sprint
-              </Button>
+              <Dialog open={assignSprintModalOpen} onOpenChange={setAssignSprintModalOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    Assign Sprint
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
+                    <DialogTitle className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Assign to Sprint
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="max-h-80 overflow-y-auto">
+                    <div className="space-y-2">
+                      {sprints.map((sprint) => (
+                        <div
+                          key={sprint.id}
+                          className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
+                            selectedSprintId === sprint.id ? "bg-primary/10 border-primary" : ""
+                          }`}
+                          onClick={() => setSelectedSprintId(sprint.id)}
+                        >
+                          <div className="font-medium">Sprint {sprint.number}</div>
+                          <div className="text-sm text-muted-foreground">{sprint.name}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2 pt-4 border-t">
+                    <Button variant="outline" onClick={() => setAssignSprintModalOpen(false)} size="sm">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleBulkAssignSprint} disabled={!selectedSprintId} size="sm">
+                      Assign
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-              <Select value={bulkAssigneeId} onValueChange={setBulkAssigneeId}>
-                <SelectTrigger className="w-40 h-8">
-                  <SelectValue placeholder="Assign to Person" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teamMembers.map((member) => (
-                    <SelectItem key={member.id} value={member.id}>
-                      {member.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button size="sm" onClick={handleBulkAssignPerson} disabled={!bulkAssigneeId}>
-                <Users className="h-3 w-3 mr-1" />
-                Assign Person
-              </Button>
+              <Dialog open={assignPersonModalOpen} onOpenChange={setAssignPersonModalOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
+                    <Users className="h-3 w-3 mr-1" />
+                    Assign Person
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
+                    <DialogTitle className="flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Assign to Person
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="max-h-80 overflow-y-auto">
+                    <div className="space-y-2">
+                      {teamMembers.map((member) => {
+                        const memberTeam = teams.find((t) => t.id === member.teamId)
+                        return (
+                          <div
+                            key={member.id}
+                            className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 flex items-center space-x-3 ${
+                              selectedPersonId === member.id ? "bg-primary/10 border-primary" : ""
+                            }`}
+                            onClick={() => setSelectedPersonId(member.id)}
+                          >
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={member.avatar || "/placeholder.svg"} />
+                              <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium">{member.name}</div>
+                              <div className="text-sm text-muted-foreground">{memberTeam?.name || "No Team"}</div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2 pt-4 border-t">
+                    <Button variant="outline" onClick={() => setAssignPersonModalOpen(false)} size="sm">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleBulkAssignPerson} disabled={!selectedPersonId} size="sm">
+                      Assign
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-              <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
-                <Trash2 className="h-3 w-3 mr-1" />
-                Delete Selected
+              <Button size="sm" variant="destructive" onClick={handleBulkDelete} className="h-8 text-xs ml-auto">
+                <Trash2 className="h-3 w-3" />
               </Button>
             </div>
           </div>
@@ -397,7 +459,16 @@ export function EnhancedIssuesList({
                       <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
                     </div>
                   </TableCell>
-                  <TableCell>{sprint?.name || "No Sprint"}</TableCell>
+                  <TableCell>
+                    {sprint ? (
+                      <div>
+                        <div className="font-medium">Sprint {sprint.number}</div>
+                        <div className="text-sm text-muted-foreground">{sprint.name}</div>
+                      </div>
+                    ) : (
+                      "No Sprint"
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex space-x-1">
