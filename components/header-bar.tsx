@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { PanelLeft, X } from "lucide-react"
+import { SidebarOpenIcon, SidebarCloseIcon } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { NotificationBell } from "@/components/notification-bell"
 import type { ViewType, Notification } from "@/types"
@@ -42,7 +42,7 @@ export function HeaderBar({
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 flex items-center justify-between w-auto px-2 h-10">
       <div className="flex items-center space-x-2">
         <Button variant="ghost" size="sm" onClick={onToggleExpanded} className="p-2">
-          {isExpanded ? <X className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+          {isExpanded ? <SidebarCloseIcon className="h-4 w-4" /> : <SidebarOpenIcon className="h-4 w-4" />}
         </Button>
 
         <Separator orientation="vertical" className="h-6" />
