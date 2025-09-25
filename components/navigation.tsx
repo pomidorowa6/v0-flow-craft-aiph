@@ -90,13 +90,13 @@ export function Navigation({
     <nav
       className={cn(
         "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out",
-        shouldShowExpanded ? "w-70" : "w-16",
+        shouldShowExpanded ? "w-60" : "w-16",
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex flex-col h-full">
-        <div className="flex items-center h-[72px] px-4">
+        <div className="flex items-center px-4 h-20">
           <div className="flex items-center space-x-3">
             <div className="bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-sm font-bold flex-shrink-0 w-10 h-10">
               F
