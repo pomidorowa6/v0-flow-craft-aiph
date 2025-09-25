@@ -327,8 +327,8 @@ export function EnhancedIssuesList({
                           }`}
                           onClick={() => setSelectedSprintId(sprint.id)}
                         >
-                          <div className="font-medium">Sprint {sprint.number}</div>
-                          <div className="text-sm text-muted-foreground">{sprint.name}</div>
+                          <div className="font-medium">Sprint {sprint.no}</div>
+                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
                         </div>
                       ))}
                     </div>
@@ -464,8 +464,8 @@ export function EnhancedIssuesList({
                     {sprint ? (
                       <div>
                         {console.log("[v0] Sprint data:", sprint)}
-                        <div className="font-medium">{sprint.no}</div>
-                      <div className="text-sm text-muted-foreground">{sprint.title}</div>
+                        <CardSprintNumber>{sprint.no}</CardSprintNumber>
+                        <CardSprintTitle>{sprint.title}</CardSprintTitle>
                       </div>
                     ) : (
                       "No Sprint"
