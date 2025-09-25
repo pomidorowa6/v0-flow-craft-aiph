@@ -413,7 +413,7 @@ export function EnhancedIssuesList({
               <TableHead>Issue</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Business Impact</TableHead>
+              <TableHead>Impact</TableHead>
               <TableHead>Team/Assignee</TableHead>
               <TableHead>Sprint</TableHead>
               <TableHead>Created</TableHead>
