@@ -156,11 +156,11 @@ export function Navigation({
           <div className="p-4 text-left">
             <div
               className={cn(
-                "flex space-x-3 p-2 rounded-lg hover:bg-accent/50 cursor-pointer py-0 px-0 items-center text-left",
+                "flex space-x-3 p-2 rounded-lg hover:bg-accent/50 cursor-pointer py-0 px-0 text-left items-center",
                 !isExpanded && "justify-center",
               )}
             >
-              <div className="w-8 h-8 bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0 text-left rounded-md">
+              <div className="w-8 bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0 text-left rounded-md h-8">
                 JD
               </div>
               {isExpanded && (
