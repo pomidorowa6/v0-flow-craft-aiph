@@ -94,7 +94,7 @@ export function Navigation({
         <div className="flex flex-col h-full">
           <div className="flex items-center px-4 w-16 h-[72px]">
             <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center flex-shrink-0 w-fit h-fit">
+              <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
                 <Image src="/images/flowcraft-logo.png" alt="FlowCraft" width={32} height={32} className="rounded-lg" />
               </div>
               {isExpanded && <h1 className="text-lg font-semibold whitespace-nowrap text-foreground">FlowCraft</h1>}
