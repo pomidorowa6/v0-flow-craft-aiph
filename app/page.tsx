@@ -281,7 +281,7 @@ export default function TaskFlowApp() {
 
       <div className={`transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"}`}>
         <div className="p-4 min-h-screen pl-0 pt-4 pb-4 pr-4 mx-0">
-          <main className="bg-background rounded-xl shadow-lg border-border h-[calc(100vh-2rem)] flex flex-col overflow-hidden border-0">
+          <main className="bg-background rounded-xl shadow-lg border-border h-[calc(100vh-2rem)] flex flex-col overflow-hidden border-0 border-none">
             <HeaderBar
               currentView={currentView}
               isExpanded={isSidebarExpanded}
