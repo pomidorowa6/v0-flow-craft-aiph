@@ -95,7 +95,7 @@ export function Navigation({
       >
         <div className="flex flex-col h-full">
           <div
-            className={cn("flex items-center h-[72px] px-3 justify-center", isMobile || isExpanded ? "w-full" : "w-16")}
+            className={cn("flex items-center h-[72px] px-3 text-left mx-2 justify-start", isMobile || isExpanded ? "w-full" : "w-16")}
           >
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
