@@ -121,7 +121,24 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
           )}
         </CardContent>
       </Card>
-
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-5 py-4 border-b border-none">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-gray-600">{sprintIssues.filter((i) => i.status === "Todo").length}</div>
+          <div className="text-sm text-muted-foreground">Todo</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-blue-600">{inProgressIssues.length}</div>
+          <div className="text-muted-foreground text-sm">In Progress</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-yellow-600">{inReviewIssues.length}</div>
+          <div className="text-muted-foreground text-sm">In Review</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600">{completedIssues.length}</div>
+          <div className="text-muted-foreground text-sm">Completed</div>
+        </div>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
