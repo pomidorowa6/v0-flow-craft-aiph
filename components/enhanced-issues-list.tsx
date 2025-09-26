@@ -455,7 +455,7 @@ export function EnhancedIssuesList({
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label={`Delete issue ${issue.title}`}
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3 w-3 text-foreground" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
