@@ -94,7 +94,7 @@ export function Navigation({
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center px-4 w-16 h-[72px]">
+          <div className="flex items-center w-16 h-[72px] px-3 justify-center">
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
                 <Image src="/images/flowcraft-logo.png" alt="FlowCraft" width={32} height={32} className="rounded-lg" />
@@ -106,7 +106,7 @@ export function Navigation({
           </div>
 
           <div className="flex-1 py-4">
-            <div className="px-4 space-y-2 text-left">
+            <div className="space-y-2 text-left px-3">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = currentView === item.id
@@ -164,7 +164,7 @@ export function Navigation({
             </div>
           </div>
 
-          <div className="p-4 text-left">
+          <div className="p-4 text-left px-3 py-4">
             <div
               className={cn(
                 "flex space-x-3 p-2 rounded-lg hover:bg-sidebar-accent/50 cursor-pointer py-0 px-0 text-left items-center",
