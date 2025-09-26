@@ -63,8 +63,11 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            {sprint.name}
+            <Target className="h-5 w-5" /> 
+            <div className="py-0">
+              Sprint {sprint.no} - {sprint.title}
+              <p className="text-m text-muted-foreground">{sprint.title}</p>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
