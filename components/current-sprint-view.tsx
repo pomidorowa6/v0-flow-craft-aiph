@@ -53,21 +53,21 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Current Sprint</h1>
-        <Badge className="bg-green-100 text-green-800 border-green-200" variant="outline">
-          Active
-        </Badge>
-      </div>
+      
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" /> 
-            <div className="py-0">
-              Sprint {sprint.no} - {sprint.title}
-              <p className="text-m text-muted-foreground">{sprint.title}</p>
+            <div className="flex flex-row items-center gap-3">
+              <Target className="h-5 w-5" /> 
+              <div className="flex flex-col items-start gap-1 justify-stretch">
+                Sprint {sprint.no}
+                <p className="text-m text-muted-foreground font-normal">{sprint.title}</p>
+              </div>
             </div>
+            <Badge className="bg-green-100 text-green-800 border-green-200" variant="outline">
+              Active
+            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -69,7 +69,7 @@ export function KanbanBoard({ sprint, issues, onUpdateIssueStatus }: KanbanBoard
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Kanban Board</h2>
-          <p className="text-sm text-muted-foreground">Sprint {sprint.no} - {sprint.title}</p>
+          
         
         </div>
         <Badge
