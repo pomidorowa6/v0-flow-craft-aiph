@@ -613,7 +613,7 @@ export function EnhancedIssuesList({
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogContent>Cancel</AlertDialogContent>
+                    <AlertDialogAction>Cancel</AlertDialogAction>
                     <AlertDialogCancel onClick={handleBulkDelete} variant="outline">
                       Delete All
                     </AlertDialogCancel>
