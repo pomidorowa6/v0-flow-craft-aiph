@@ -92,12 +92,7 @@ export default function AdvancedAnalytics() {
   return (
     <div className="space-y-6">
       {/* Header with filters */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Advanced Analytics</h2>
-          <p className="text-muted-foreground">Deep insights into team performance and project health</p>
-        </div>
-      </div>
+      
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
