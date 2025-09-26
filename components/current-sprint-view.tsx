@@ -143,45 +143,7 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">
-                {sprintIssues.filter((i) => i.status === "Todo").length}
-              </div>
-              <div className="text-sm text-muted-foreground">Todo</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{inProgressIssues.length}</div>
-              <div className="text-sm text-muted-foreground">In Progress</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{inReviewIssues.length}</div>
-              <div className="text-sm text-muted-foreground">In Review</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{completedIssues.length}</div>
-              <div className="text-sm text-muted-foreground">Done</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      
 
       <KanbanBoard sprint={sprint} issues={issues} onUpdateIssueStatus={onUpdateIssueStatus} />
     </div>
