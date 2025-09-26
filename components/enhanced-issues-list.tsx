@@ -141,12 +141,14 @@ export function EnhancedIssuesList({
   }
 
   return (
-    <div className="space-y-4 h-full flex flex-col">
-      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4 flex-shrink-0">
-        {/* Filters and actions will go here */}
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border border-border rounded-lg bg-muted/20 gap-4">
+        <div className="flex items-center justify-center text-sm text-muted-foreground">
+          Filters and actions will go here
+        </div>
       </div>
 
-      <div className="border rounded-lg flex-1 flex flex-col min-h-0">
+      <div className="border rounded-lg max-h-[600px] flex flex-col">
         <div className="flex-1 overflow-hidden">
           <div className="h-full overflow-auto">
             <Table>
