@@ -95,7 +95,10 @@ export function Navigation({
       >
         <div className="flex flex-col h-full">
           <div
-            className={cn("flex items-center h-[72px] px-3 text-left mx-2 justify-start", isMobile || isExpanded ? "w-full" : "w-16")}
+            className={cn(
+              "flex items-center h-[72px] px-4 text-left justify-start",
+              isMobile || isExpanded ? "w-full" : "w-16",
+            )}
           >
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
@@ -108,7 +111,7 @@ export function Navigation({
           </div>
 
           <div className="flex-1 py-4">
-            <div className="space-y-2 text-left px-3">
+            <div className="space-y-2 text-left px-4">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = currentView === item.id
@@ -166,7 +169,7 @@ export function Navigation({
             </div>
           </div>
 
-          <div className="p-4 text-left px-3 py-4">
+          <div className="p-4 text-left px-4 py-4">
             <div
               className={cn(
                 "flex space-x-3 p-2 rounded-lg hover:bg-sidebar-accent/50 cursor-pointer py-0 px-0 text-left items-center",
