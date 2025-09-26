@@ -215,13 +215,14 @@ export function EnhancedIssuesList({
                   <div className="flex items-center space-x-2">
                     <span className="font-medium">Issue</span>
                     <div className="relative flex-1 min-w-[150px]">
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+
                       <Input
-                        placeholder="Search..."
+                        placeholder="Issue"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-7 h-8 text-xs"
                       />
+                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                     </div>
                   </div>
                 </TableHead>
