@@ -266,7 +266,7 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
       </div>
 
       <Tabs defaultValue="dependencies" className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <TabsList>
             <TabsTrigger value="dependencies">Dependencies Map</TabsTrigger>
             <TabsTrigger value="chains">Dependency Chains</TabsTrigger>
