@@ -4,11 +4,11 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Users, Target } from "lucide-react"
 import { KanbanBoard } from "./kanban-board"
-import type { Issue, Sprint, IssueStatus } from "@/types"
+import type { EnhancedIssue, Sprint, IssueStatus } from "@/types"
 
 interface CurrentSprintViewProps {
   sprint: Sprint | null
-  issues: Issue[]
+  issues: EnhancedIssue[]
   onUpdateIssueStatus: (issueId: string, newStatus: IssueStatus) => void
 }
 
@@ -53,13 +53,11 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
 
   return (
     <div className="space-y-6">
-      
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="flex flex-row items-center gap-3">
-              <Target className="h-5 w-5" /> 
+              <Target className="h-5 w-5" />
               <div className="flex flex-col items-start gap-1 justify-stretch">
                 Sprint {sprint.no}
                 <p className="text-m text-muted-foreground">{sprint.title}</p>

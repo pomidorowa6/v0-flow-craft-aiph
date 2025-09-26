@@ -119,8 +119,8 @@ export default function TaskFlowApp() {
   }
 
   const handleUpdateIssueStatus = (issueId: string, newStatus: IssueStatus) => {
-    setIssues(
-      issues.map((issue) =>
+    setEnhancedIssues(
+      enhancedIssues.map((issue) =>
         issue.id === issueId
           ? {
               ...issue,
@@ -235,7 +235,7 @@ export default function TaskFlowApp() {
         return (
           <CurrentSprintView
             sprint={activeSprint || null}
-            issues={issues}
+            issues={enhancedIssues}
             onUpdateIssueStatus={handleUpdateIssueStatus}
           />
         )
