@@ -213,9 +213,7 @@ export function EnhancedIssuesList({
                 </TableHead>
                 <TableHead className="min-w-[200px]">
                   <div className="flex items-center space-x-2">
-                    <span className="font-medium">Issue</span>
                     <div className="relative flex-1 min-w-[150px]">
-
                       <Input
                         placeholder="Issue"
                         value={searchTerm}
@@ -287,7 +285,7 @@ export function EnhancedIssuesList({
                     <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
                       <div className="flex items-center">
                         <span>Team</span>
-                        
+                        <ChevronDown className="h-3 w-3 ml-1" />
                       </div>
                     </SelectTrigger>
                     <SelectContent>
