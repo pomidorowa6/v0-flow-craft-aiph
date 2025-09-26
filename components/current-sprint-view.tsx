@@ -62,7 +62,7 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
               <Target className="h-5 w-5" /> 
               <div className="flex flex-col items-start gap-1 justify-stretch">
                 Sprint {sprint.no}
-                <p className="text-m text-muted-foreground font-normal">{sprint.title}</p>
+                <p className="text-m text-muted-foreground">{sprint.title}</p>
               </div>
             </div>
             <Badge className="bg-green-100 text-green-800 border-green-200" variant="outline">
