@@ -19,6 +19,7 @@ interface NavigationProps {
   onMarkAllAsRead: () => void
   isExpanded: boolean
   onToggleExpanded: () => void
+  isMobile?: boolean
 }
 
 export function Navigation({
@@ -33,6 +34,7 @@ export function Navigation({
   onMarkAllAsRead,
   isExpanded,
   onToggleExpanded,
+  isMobile = false,
 }: NavigationProps) {
   const activeSprint = sprints.find((sprint) => sprint.status === "Active")
   const activeSprintIssues = issues.filter((issue) => issue.sprintId === activeSprint?.id)
@@ -87,8 +89,8 @@ export function Navigation({
     <TooltipProvider>
       <nav
         className={cn(
-          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out",
-          isExpanded ? "w-64" : "w-16",
+          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out bg-sidebar border-r border-sidebar-border",
+          isMobile ? (isExpanded ? "w-64 translate-x-0" : "w-64 -translate-x-full") : isExpanded ? "w-64" : "w-16",
         )}
       >
         <div className="flex flex-col h-full">
@@ -97,7 +99,9 @@ export function Navigation({
               <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
                 <Image src="/images/flowcraft-logo.png" alt="FlowCraft" width={32} height={32} className="rounded-lg" />
               </div>
-              {isExpanded && <h1 className="text-lg font-semibold whitespace-nowrap text-foreground">FlowCraft</h1>}
+              {(isMobile || isExpanded) && (
+                <h1 className="text-lg font-semibold whitespace-nowrap text-sidebar-foreground">FlowCraft</h1>
+              )}
             </div>
           </div>
 
@@ -113,17 +117,24 @@ export function Navigation({
                     key={item.id}
                     variant="ghost"
                     size="sm"
-                    onClick={() => !isDisabled && onViewChange(item.id)}
+                    onClick={() => {
+                      if (!isDisabled) {
+                        onViewChange(item.id)
+                        if (isMobile) {
+                          onToggleExpanded()
+                        }
+                      }
+                    }}
                     disabled={isDisabled}
                     className={cn(
-                      "w-full justify-start h-10 px-3 text-muted-foreground hover:text-foreground hover:bg-accent/50",
-                      isActive && "bg-accent text-foreground",
+                      "w-full justify-start h-10 px-3 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
+                      isActive && "bg-sidebar-accent text-sidebar-foreground",
                       isDisabled && "opacity-50 cursor-not-allowed",
-                      !isExpanded && "px-3 justify-center",
+                      !isMobile && !isExpanded && "px-3 justify-center",
                     )}
                   >
                     <Icon className="h-4 w-4 flex-shrink-0" />
-                    {isExpanded && (
+                    {(isMobile || isExpanded) && (
                       <>
                         <span className="ml-3 truncate">{item.label}</span>
                         <Badge variant="secondary" className="ml-auto text-xs">
@@ -134,7 +145,7 @@ export function Navigation({
                   </Button>
                 )
 
-                if (!isExpanded) {
+                if (!isMobile && !isExpanded) {
                   return (
                     <Tooltip key={item.id}>
                       <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
@@ -156,17 +167,17 @@ export function Navigation({
           <div className="p-4 text-left">
             <div
               className={cn(
-                "flex space-x-3 p-2 rounded-lg hover:bg-accent/50 cursor-pointer py-0 px-0 text-left items-center",
-                !isExpanded && "justify-center",
+                "flex space-x-3 p-2 rounded-lg hover:bg-sidebar-accent/50 cursor-pointer py-0 px-0 text-left items-center",
+                !isMobile && !isExpanded && "justify-center",
               )}
             >
-              <div className="w-8 bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0 text-left rounded-md h-8">
+              <div className="w-8 bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground text-sm font-medium flex-shrink-0 text-left rounded-md h-8">
                 JD
               </div>
-              {isExpanded && (
+              {(isMobile || isExpanded) && (
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-medium truncate text-foreground">John Doe</span>
-                  <span className="text-xs text-muted-foreground truncate">john.doe@xyz.com</span>
+                  <span className="text-sm font-medium truncate text-sidebar-foreground">John Doe</span>
+                  <span className="text-xs text-sidebar-foreground/70 truncate">john.doe@xyz.com</span>
                 </div>
               )}
             </div>
