@@ -1,6 +1,5 @@
 "use client"
-
-import type React from "react"
+import { useState, useMemo } from "react"
 
 import { format } from "date-fns"
 import { Search, ChevronDown, MoreHorizontal } from "lucide-react"
@@ -59,28 +58,9 @@ interface EnhancedIssuesListProps {
   teams: Team[]
   teamMembers: TeamMember[]
   sprints: Sprint[]
-  selectedIssues: Set<string>
-  filteredAndSortedIssues: Issue[]
-  searchTerm: string
-  priorityFilter: Priority | "all"
-  statusFilter: IssueStatus | "all"
-  businessImpactFilter: BusinessImpact | "all"
-  teamFilter: string
-  handleSelectAll: (checked: boolean) => void
-  handleSelectIssue: (issueId: string, checked: boolean) => void
-  setSearchTerm: (term: string) => void
-  setPriorityFilter: (priority: Priority | "all") => void
-  setStatusFilter: (status: IssueStatus | "all") => void
-  setBusinessImpactFilter: (impact: BusinessImpact | "all") => void
-  setTeamFilter: (teamId: string) => void
-  handleDeleteSelected: () => void
-  handleDeleteIssue: (issueId: string) => void
-  handleEditIssue: (issueId: string) => void
-  isDeleteDialogOpen: boolean
-  setIsDeleteDialogOpen: (open: boolean) => void
-  issueToDeleteId: string | null
-  confirmDeleteIssue: () => void
-  setSelectedIssues: React.Dispatch<React.SetStateAction<Set<string>>>
+  onCreateIssue: (issueData: Partial<Issue>) => void
+  onEditIssue: (issueData: Issue) => void
+  onDeleteIssue: (issueId: string) => void
 }
 
 export function EnhancedIssuesList({
@@ -88,29 +68,78 @@ export function EnhancedIssuesList({
   teams,
   teamMembers,
   sprints,
-  selectedIssues,
-  filteredAndSortedIssues,
-  searchTerm,
-  priorityFilter,
-  statusFilter,
-  businessImpactFilter,
-  teamFilter,
-  handleSelectAll,
-  handleSelectIssue,
-  setSearchTerm,
-  setPriorityFilter,
-  setStatusFilter,
-  setBusinessImpactFilter,
-  setTeamFilter,
-  handleDeleteSelected,
-  handleDeleteIssue,
-  handleEditIssue,
-  isDeleteDialogOpen,
-  setIsDeleteDialogOpen,
-  issueToDeleteId,
-  confirmDeleteIssue,
-  setSelectedIssues,
+  onCreateIssue,
+  onEditIssue,
+  onDeleteIssue,
 }: EnhancedIssuesListProps) {
+  const [selectedIssues, setSelectedIssues] = useState<Set<string>>(() => new Set())
+  const [searchTerm, setSearchTerm] = useState("")
+  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all")
+  const [statusFilter, setStatusFilter] = useState<IssueStatus | "all">("all")
+  const [businessImpactFilter, setBusinessImpactFilter] = useState<BusinessImpact | "all">("all")
+  const [teamFilter, setTeamFilter] = useState<string>("all")
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [issueToDeleteId, setIssueToDeleteId] = useState<string | null>(null)
+
+  const filteredAndSortedIssues = useMemo(() => {
+    return issues.filter((issue) => {
+      const matchesSearch = issue.title.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesPriority = priorityFilter === "all" || issue.priority === priorityFilter
+      const matchesStatus = statusFilter === "all" || issue.status === statusFilter
+      const matchesImpact = businessImpactFilter === "all" || issue.businessImpact === businessImpactFilter
+      const matchesTeam = teamFilter === "all" || issue.teamId === teamFilter
+
+      return matchesSearch && matchesPriority && matchesStatus && matchesImpact && matchesTeam
+    })
+  }, [issues, searchTerm, priorityFilter, statusFilter, businessImpactFilter, teamFilter])
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIssues(new Set(filteredAndSortedIssues.map((issue) => issue.id)))
+    } else {
+      setSelectedIssues(new Set())
+    }
+  }
+
+  const handleSelectIssue = (issueId: string, checked: boolean) => {
+    const newSelected = new Set(selectedIssues || [])
+    if (checked) {
+      newSelected.add(issueId)
+    } else {
+      newSelected.delete(issueId)
+    }
+    setSelectedIssues(newSelected)
+  }
+
+  const handleDeleteSelected = () => {
+    if (selectedIssues) {
+      selectedIssues.forEach((issueId) => {
+        onDeleteIssue(issueId)
+      })
+    }
+    setSelectedIssues(new Set())
+  }
+
+  const handleDeleteIssue = (issueId: string) => {
+    setIssueToDeleteId(issueId)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleEditIssue = (issueId: string) => {
+    const issue = issues.find((i) => i.id === issueId)
+    if (issue) {
+      onEditIssue(issue)
+    }
+  }
+
+  const confirmDeleteIssue = () => {
+    if (issueToDeleteId) {
+      onDeleteIssue(issueToDeleteId)
+      setIsDeleteDialogOpen(false)
+      setIssueToDeleteId(null)
+    }
+  }
+
   return (
     <div className="space-y-4 h-full flex flex-col">
       <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4 flex-shrink-0">
@@ -126,7 +155,9 @@ export function EnhancedIssuesList({
                   <TableHead className="w-12 h-10 text-sm font-medium text-foreground">
                     <Checkbox
                       checked={
-                        selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
+                        selectedIssues &&
+                        selectedIssues.size === filteredAndSortedIssues.length &&
+                        filteredAndSortedIssues.length > 0
                       }
                       onCheckedChange={handleSelectAll}
                     />
@@ -236,7 +267,7 @@ export function EnhancedIssuesList({
                     <TableRow key={issue.id}>
                       <TableCell className="w-12 p-4">
                         <Checkbox
-                          checked={selectedIssues.has(issue.id)}
+                          checked={selectedIssues ? selectedIssues.has(issue.id) : false}
                           onCheckedChange={(checked) => handleSelectIssue(issue.id, checked)}
                         />
                       </TableCell>
@@ -284,11 +315,16 @@ export function EnhancedIssuesList({
               onClick={() => {
                 setSelectedIssues(new Set())
               }}
-              disabled={selectedIssues.size === 0}
+              disabled={!selectedIssues || selectedIssues.size === 0}
             >
               Clear Selection
             </Button>
-            <Button variant="destructive" size="sm" onClick={handleDeleteSelected} disabled={selectedIssues.size === 0}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteSelected}
+              disabled={!selectedIssues || selectedIssues.size === 0}
+            >
               Delete Selected
             </Button>
           </div>
