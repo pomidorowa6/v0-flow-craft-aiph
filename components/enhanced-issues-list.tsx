@@ -3,14 +3,13 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CardSprintNumber, CardSprintTitle } from "@/components/ui/card"
-import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Users, Calendar, ChevronDown } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
 import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
 
@@ -39,7 +38,6 @@ export function EnhancedIssuesList({
   const [businessImpactFilter, setBusinessImpactFilter] = useState<BusinessImpact | "all">("all")
   const [teamFilter, setTeamFilter] = useState<string>("all")
   const [sortBy, setSortBy] = useState<"priority" | "businessImpact" | "created" | "updated">("priority")
-  const [showBlockedOnly, setShowBlockedOnly] = useState(false)
   const [selectedIssues, setSelectedIssues] = useState<Set<string>>(new Set())
   const [assignSprintModalOpen, setAssignSprintModalOpen] = useState(false)
   const [assignPersonModalOpen, setAssignPersonModalOpen] = useState(false)
@@ -56,9 +54,8 @@ export function EnhancedIssuesList({
       const matchesPriority = priorityFilter === "all" || issue.priority === priorityFilter
       const matchesBusinessImpact = businessImpactFilter === "all" || issue.businessImpact === businessImpactFilter
       const matchesTeam = teamFilter === "all" || issue.teamId === teamFilter
-      const matchesBlocked = !showBlockedOnly || issue.blockedReason
 
-      return matchesSearch && matchesStatus && matchesPriority && matchesBusinessImpact && matchesTeam && matchesBlocked
+      return matchesSearch && matchesStatus && matchesPriority && matchesBusinessImpact && matchesTeam
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -77,7 +74,7 @@ export function EnhancedIssuesList({
       }
     })
 
-  const blockedIssuesCount = issues.filter((issue) => issue.blockedReason).length
+  const blockedIssuesCount = issues.filter((issue) => issue.status === "Blocked").length
   const highImpactCount = issues.filter(
     (issue) => issue.businessImpact === "Critical" || issue.businessImpact === "High",
   ).length
@@ -185,117 +182,209 @@ export function EnhancedIssuesList({
           <div className="text-muted-foreground text-sm">Completed</div>
         </div>
         <div className="flex items-center space-x-2 text-right flex-row justify-end">
-            <EnhancedIssueForm
-              sprints={sprints}
-              teams={teams}
-              teamMembers={teamMembers}
-              onSubmit={onCreateIssue}
-              onCancel={() => {}}
-              trigger={
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Issue
-                </Button>
-              }
-            />
-          </div>
+          <EnhancedIssueForm
+            sprints={sprints}
+            teams={teams}
+            teamMembers={teamMembers}
+            onSubmit={onCreateIssue}
+            onCancel={() => {}}
+            trigger={
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Issue
+              </Button>
+            }
+          />
+        </div>
       </div>
 
       <div className="border rounded-lg">
-        <div className="flex items-center justify-between p-4 border-b bg-muted/20">
-          <div className="relative flex-1 mr-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search issues..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-        </div>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={
+                      selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
+                    }
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                <TableHead className="min-w-[200px]">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">Issue</span>
+                    <div className="relative flex-1 min-w-[150px]">
+                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                      <Input
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-7 h-8 text-xs"
+                      />
+                    </div>
+                  </div>
+                </TableHead>
+                <TableHead className="min-w-[120px]">
+                  <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
+                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                      <div className="flex items-center">
+                        <span>Priority</span>
+                        <ChevronDown className="h-3 w-3 ml-1" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Priority</SelectItem>
+                      <SelectItem value="P0">P0 - Critical</SelectItem>
+                      <SelectItem value="P1">P1 - High</SelectItem>
+                      <SelectItem value="P2">P2 - Medium</SelectItem>
+                      <SelectItem value="P3">P3 - Low</SelectItem>
+                      <SelectItem value="P4">P4 - Lowest</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableHead>
+                <TableHead className="min-w-[120px]">
+                  <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
+                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                      <div className="flex items-center">
+                        <span>Status</span>
+                        <ChevronDown className="h-3 w-3 ml-1" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="Todo">Todo</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="In Review">In Review</SelectItem>
+                      <SelectItem value="Done">Done</SelectItem>
+                      <SelectItem value="Blocked">Blocked</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableHead>
+                <TableHead className="min-w-[120px]">
+                  <Select
+                    value={businessImpactFilter}
+                    onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
+                  >
+                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                      <div className="flex items-center">
+                        <span>Impact</span>
+                        <ChevronDown className="h-3 w-3 ml-1" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Impact</SelectItem>
+                      <SelectItem value="Critical">Critical</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableHead>
+                <TableHead className="min-w-[120px]">
+                  <Select value={teamFilter} onValueChange={setTeamFilter}>
+                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                      <div className="flex items-center">
+                        <span>Team</span>
+                        <ChevronDown className="h-3 w-3 ml-1" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Teams</SelectItem>
+                      {teams.map((team) => (
+                        <SelectItem key={team.id} value={team.id}>
+                          {team.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableHead>
+                <TableHead>Sprint</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="w-20">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredAndSortedIssues.map((issue) => {
+                const team = teams.find((t) => t.id === issue.teamId)
+                const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
+                const sprint = sprints.find((s) => s.id === issue.sprintId)
 
-        <div className="flex flex-wrap items-center p-4 border-b bg-muted/20 justify-stretch gap-2">
-          <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
-            <SelectTrigger className="w-40 h-10">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Todo">Todo</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="In Review">In Review</SelectItem>
-              <SelectItem value="Done">Done</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
-            <SelectTrigger className="w-40 h-10">
-              <SelectValue placeholder="Priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Priority</SelectItem>
-              <SelectItem value="P0">P0 - Critical</SelectItem>
-              <SelectItem value="P1">P1 - High</SelectItem>
-              <SelectItem value="P2">P2 - Medium</SelectItem>
-              <SelectItem value="P3">P3 - Low</SelectItem>
-              <SelectItem value="P4">P4 - Lowest</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={businessImpactFilter}
-            onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
-          >
-            <SelectTrigger className="w-40 h-10">
-              <SelectValue placeholder="Business Impact" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Impact</SelectItem>
-              <SelectItem value="Critical">Critical</SelectItem>
-              <SelectItem value="High">High</SelectItem>
-              <SelectItem value="Medium">Medium</SelectItem>
-              <SelectItem value="Low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={teamFilter} onValueChange={setTeamFilter}>
-            <SelectTrigger className="w-40 h-10">
-              <SelectValue placeholder="Team" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Teams</SelectItem>
-              {teams.map((team) => (
-                <SelectItem key={team.id} value={team.id}>
-                  {team.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={sortBy}
-            onValueChange={(value: "priority" | "businessImpact" | "created" | "updated") => setSortBy(value)}
-          >
-            <SelectTrigger className="w-40 h-10">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="priority">Priority</SelectItem>
-              <SelectItem value="businessImpact">Business Impact</SelectItem>
-              <SelectItem value="created">Created Date</SelectItem>
-              <SelectItem value="updated">Updated Date</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button
-            variant={showBlockedOnly ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowBlockedOnly(!showBlockedOnly)}
-            className="h-10"
-          >
-            Blocked Only
-          </Button>
+                return (
+                  <TableRow key={issue.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIssues.has(issue.id)}
+                        onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{issue.title}</div>
+                        <div className="text-sm text-muted-foreground">{issue.id}</div>
+                        {issue.status === "Blocked" && (
+                          <Badge variant="destructive" className="mt-1">
+                            Blocked
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPriorityColor(issue.priority)}>{issue.priority}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{issue.status}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{team?.name || "Unassigned"}</div>
+                        <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {sprint ? (
+                        <div>
+                          <div className="font-medium">{sprint.no}</div>
+                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
+                        </div>
+                      ) : (
+                        "No Sprint"
+                      )}
+                    </TableCell>
+                    <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <EnhancedIssueForm
+                          issue={issue}
+                          sprints={sprints}
+                          teams={teams}
+                          teamMembers={teamMembers}
+                          onSubmit={onEditIssue}
+                          onCancel={() => {}}
+                          trigger={
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Edit className="h-3 w-3 text-foreground" />
+                            </Button>
+                          }
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          onClick={() => onDeleteIssue(issue.id)}
+                        >
+                          <Trash2 className="h-3 w-3 text-foreground" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
         </div>
 
         {selectedIssues.size > 0 && (
@@ -401,108 +490,6 @@ export function EnhancedIssuesList({
             </div>
           </div>
         )}
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead>Issue</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Impact</TableHead>
-              <TableHead>Team/Assignee</TableHead>
-              <TableHead>Sprint</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAndSortedIssues.map((issue) => {
-              const team = teams.find((t) => t.id === issue.teamId)
-              const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
-              const sprint = sprints.find((s) => s.id === issue.sprintId)
-
-              return (
-                <TableRow key={issue.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedIssues.has(issue.id)}
-                      onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{issue.title}</div>
-                      <div className="text-sm text-muted-foreground">{issue.id}</div>
-                      {issue.blockedReason && (
-                        <Badge variant="destructive" className="mt-1">
-                          Blocked
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getPriorityColor(issue.priority)}>{issue.priority}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{issue.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{team?.name || "Unassigned"}</div>
-                      <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {sprint ? (
-                      <div>
-                        {console.log("[v0] Sprint data:", sprint)}
-                        <div className="font-medium">{sprint.no}</div>
-                        <div className="text-sm text-muted-foreground">{sprint.title}</div>
-                      </div>
-                    ) : (
-                      "No Sprint"
-                    )}
-                  </TableCell>
-                  <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-1">
-                      <EnhancedIssueForm
-                        issue={issue}
-                        sprints={sprints}
-                        teams={teams}
-                        teamMembers={teamMembers}
-                        onSubmit={onEditIssue}
-                        onCancel={() => {}}
-                        trigger={
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <Edit className="h-3 w-3 text-foreground" />
-                          </Button>
-                        }
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        onClick={() => onDeleteIssue(issue.id)}
-                      >
-                        <Trash2 className="h-3 w-3 text-foreground" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
       </div>
 
       {filteredAndSortedIssues.length === 0 && (
