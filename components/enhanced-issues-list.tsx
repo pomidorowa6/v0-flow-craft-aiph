@@ -8,6 +8,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
@@ -23,6 +34,24 @@ interface EnhancedIssuesListProps {
   onDeleteIssue: (issueId: string) => void
 }
 
+/**
+ * EnhancedIssuesList - Comprehensive issue management interface with filtering and bulk operations
+ *
+ * Connected Components:
+ * - Uses @/components/ui/data-table for tabular display
+ * - Uses @/components/ui/alert-dialog for destructive action confirmations
+ * - Integrates with EnhancedIssueForm for create/edit operations
+ * - Uses semantic design tokens for WCAG AA compliance
+ *
+ * Props:
+ * - issues: Array of enhanced issues to display
+ * - sprints: Available sprints for assignment
+ * - teams: Team data for filtering and assignment
+ * - teamMembers: Team member data for assignment
+ * - onCreateIssue: Handler for creating new issues
+ * - onEditIssue: Handler for editing existing issues
+ * - onDeleteIssue: Handler for deleting issues
+ */
 export function EnhancedIssuesList({
   issues,
   sprints,
@@ -131,37 +160,56 @@ export function EnhancedIssuesList({
   const getPriorityColor = (priority: Priority) => {
     switch (priority) {
       case "P0":
-        return "bg-red-600 text-white"
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
       case "P1":
-        return "bg-red-500 text-white"
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
       case "P2":
-        return "bg-orange-500 text-white"
+        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-700"
       case "P3":
-        return "bg-yellow-500 text-black"
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
       case "P4":
-        return "bg-green-500 text-white"
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
       default:
-        return "bg-gray-500 text-white"
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
     }
   }
 
   const getImpactColor = (impact: BusinessImpact) => {
     switch (impact) {
       case "Critical":
-        return "bg-red-600 text-white"
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
       case "High":
-        return "bg-orange-500 text-white"
+        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-700"
       case "Medium":
-        return "bg-yellow-500 text-black"
+        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
       case "Low":
-        return "bg-green-500 text-white"
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
       default:
-        return "bg-gray-500 text-white"
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+    }
+  }
+
+  const getStatusColor = (status: IssueStatus) => {
+    switch (status) {
+      case "Todo":
+        return "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+      case "In Progress":
+        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
+      case "In Review":
+        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-700"
+      case "Done":
+        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
+      case "Blocked":
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
+      default:
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
     }
   }
 
   return (
     <div className="space-y-4">
+      {/* === STATISTICS OVERVIEW === */}
+      {/* Summary cards showing key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
         <div className="text-center">
           <div className="text-2xl font-bold">{issues.length}</div>
@@ -172,7 +220,7 @@ export function EnhancedIssuesList({
           <div className="text-muted-foreground text-sm">Blocked Issues</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-600">{highImpactCount}</div>
+          <div className="text-2xl font-bold text-amber-600">{highImpactCount}</div>
           <div className="text-muted-foreground text-sm">High Impact</div>
         </div>
         <div className="text-center">
@@ -198,6 +246,8 @@ export function EnhancedIssuesList({
         </div>
       </div>
 
+      {/* === ISSUES TABLE === */}
+      {/* Main data table with integrated filters and sticky header */}
       <div className="border rounded-lg flex flex-col max-h-[calc(100vh-300px)]">
         <div className="flex-1 overflow-auto">
           <Table>
@@ -209,6 +259,7 @@ export function EnhancedIssuesList({
                       selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
                     }
                     onCheckedChange={handleSelectAll}
+                    aria-label="Select all issues"
                   />
                 </TableHead>
                 <TableHead className="min-w-[200px] bg-background">
@@ -219,6 +270,7 @@ export function EnhancedIssuesList({
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-7 h-8 text-xs font-medium border-none bg-transparent hover:bg-muted/50 focus:bg-background"
+                        aria-label="Search issues"
                       />
                       <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                     </div>
@@ -226,7 +278,10 @@ export function EnhancedIssuesList({
                 </TableHead>
                 <TableHead className="min-w-[120px] bg-background">
                   <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                    <SelectTrigger
+                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                      aria-label="Filter by priority"
+                    >
                       <div className="flex items-center">
                         <span>Priority</span>
                       </div>
@@ -243,7 +298,10 @@ export function EnhancedIssuesList({
                 </TableHead>
                 <TableHead className="min-w-[120px] bg-background">
                   <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                    <SelectTrigger
+                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                      aria-label="Filter by status"
+                    >
                       <div className="flex items-center">
                         <span>Status</span>
                       </div>
@@ -263,7 +321,10 @@ export function EnhancedIssuesList({
                     value={businessImpactFilter}
                     onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
                   >
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                    <SelectTrigger
+                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                      aria-label="Filter by business impact"
+                    >
                       <div className="flex items-center">
                         <span>Impact</span>
                       </div>
@@ -279,7 +340,10 @@ export function EnhancedIssuesList({
                 </TableHead>
                 <TableHead className="min-w-[120px] bg-background">
                   <Select value={teamFilter} onValueChange={setTeamFilter}>
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
+                    <SelectTrigger
+                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                      aria-label="Filter by team"
+                    >
                       <div className="flex items-center">
                         <span>Team</span>
                       </div>
@@ -317,6 +381,7 @@ export function EnhancedIssuesList({
                       <Checkbox
                         checked={selectedIssues.has(issue.id)}
                         onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
+                        aria-label={`Select issue ${issue.title}`}
                       />
                     </TableCell>
                     <TableCell>
@@ -324,20 +389,26 @@ export function EnhancedIssuesList({
                         <div className="font-medium">{issue.title}</div>
                         <div className="text-sm text-muted-foreground">{issue.id}</div>
                         {issue.status === "Blocked" && (
-                          <Badge variant="destructive" className="mt-1">
+                          <Badge className={getStatusColor("Blocked")} variant="outline">
                             Blocked
                           </Badge>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getPriorityColor(issue.priority)}>{issue.priority}</Badge>
+                      <Badge className={getPriorityColor(issue.priority)} variant="outline">
+                        {issue.priority}
+                      </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{issue.status}</Badge>
+                      <Badge className={getStatusColor(issue.status)} variant="outline">
+                        {issue.status}
+                      </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
+                      <Badge className={getImpactColor(issue.businessImpact)} variant="outline">
+                        {issue.businessImpact}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div>
@@ -366,19 +437,45 @@ export function EnhancedIssuesList({
                           onSubmit={onEditIssue}
                           onCancel={() => {}}
                           trigger={
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              aria-label={`Edit issue ${issue.title}`}
+                            >
                               <Edit className="h-3 w-3 text-foreground" />
                             </Button>
                           }
                         />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={() => onDeleteIssue(issue.id)}
-                        >
-                          <Trash2 className="h-3 w-3 text-foreground" />
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                              aria-label={`Delete issue ${issue.title}`}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. Are you sure you want to delete "{issue.title}"?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onDeleteIssue(issue.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -388,6 +485,8 @@ export function EnhancedIssuesList({
           </Table>
         </div>
 
+        {/* === BULK OPERATIONS BAR === */}
+        {/* Appears when issues are selected, provides bulk actions */}
         {selectedIssues.size > 0 && (
           <div className="flex items-center justify-between px-4 py-2 border-b bg-primary/10 dark:bg-primary/20">
             <span className="text-sm font-medium text-foreground">
@@ -485,14 +584,52 @@ export function EnhancedIssuesList({
                 </DialogContent>
               </Dialog>
 
-              <Button size="sm" variant="destructive" onClick={handleBulkDelete} className="h-8 text-xs ml-auto">
-                <Trash2 className="h-3 w-3" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="h-8 text-xs ml-auto"
+                    disabled={selectedIssues.size === 0}
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    Delete Selected ({selectedIssues.size})
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Multiple Issues</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You are about to delete {selectedIssues.size} issues. This action cannot be undone.
+                      <div className="mt-2 p-2 bg-muted rounded text-sm">
+                        <strong>Issues to delete:</strong>
+                        <ul className="mt-1 list-disc pl-4">
+                          {Array.from(selectedIssues)
+                            .slice(0, 3)
+                            .map((issueId) => {
+                              const issue = issues.find((i) => i.id === issueId)
+                              return issue ? <li key={issue.id}>{issue.title}</li> : null
+                            })}
+                          {selectedIssues.size > 3 && <li>...and {selectedIssues.size - 3} more</li>}
+                        </ul>
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleBulkDelete} className="bg-red-600 hover:bg-red-700">
+                      Delete All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         )}
       </div>
 
+      {/* === EMPTY STATE === */}
+      {/* Shown when no issues match current filters */}
       {filteredAndSortedIssues.length === 0 && (
         <div className="text-center py-8">
           <p className="text-muted-foreground">No issues found matching your filters.</p>
