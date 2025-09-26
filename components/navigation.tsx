@@ -111,7 +111,7 @@ export function Navigation({
           </div>
 
           <div className="flex-1 py-4">
-            <div className="space-y-2 text-left px-4">
+            <div className="space-y-2 text-left px-3">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = currentView === item.id
