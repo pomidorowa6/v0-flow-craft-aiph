@@ -111,7 +111,7 @@ importers:
         specifier: 1.0.4
         version: 1.0.4(@types/react-dom@18.0.0)(@types/react@18.0.0)(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
       date-fns:
-        specifier: latest
+        specifier: 4.1.0
         version: 4.1.0
       embla-carousel-react:
         specifier: 8.5.1
@@ -149,9 +149,6 @@ importers:
       react-resizable-panels:
         specifier: ^2.1.7
         version: 2.1.7(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
-      react-router-dom:
-        specifier: 7.9.2
-        version: 7.9.2(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
       recharts:
         specifier: latest
         version: 3.2.1(@types/react@18.0.0)(react-dom@18.0.0(react@18.0.0))(react-is@17.0.2)(react@18.0.0)(redux@5.0.1)
@@ -1465,10 +1462,6 @@ packages:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  cookie@1.0.2:
-    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
-    engines: {node: '>=18'}
-
   css-box-model@1.2.1:
     resolution: {integrity: sha512-a7Vr4Q/kd/aw96bnJG332W9V9LkJO69JRcaCYDUqjp6/z0w6VcZjgAcTbgFxEPfBgdnAwlh3iwu+hLopa+flJw==}
 
@@ -1830,23 +1823,6 @@ packages:
       react: ^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
-  react-router-dom@7.9.2:
-    resolution: {integrity: sha512-pagqpVJnjZOfb+vIM23eTp7Sp/AAJjOgaowhP1f1TWOdk5/W8Uk8d/M/0wfleqx7SgjitjNPPsKeCZE1hTSp3w==}
-    engines: {node: '>=20.0.0'}
-    peerDependencies:
-      react: '>=18'
-      react-dom: '>=18'
-
-  react-router@7.9.2:
-    resolution: {integrity: sha512-i2TPp4dgaqrOqiRGLZmqh2WXmbdFknUyiCRmSKs0hf6fWXkTKg5h56b+9F22NbGRAMxjYfqQnpi63egzD2SuZA==}
-    engines: {node: '>=20.0.0'}
-    peerDependencies:
-      react: '>=18'
-      react-dom: '>=18'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
     engines: {node: '>=10'}
@@ -1885,9 +1861,6 @@ packages:
 
   scheduler@0.21.0:
     resolution: {integrity: sha512-1r87x5fz9MXqswA2ERLo0EbOAU74DpIUO090gIasYTqlVoJeMcl+Z1Rg7WHz+qtPujhS/hGIt9kxZOYBV3faRQ==}
-
-  set-cookie-parser@2.7.1:
-    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
   sonner@1.7.4:
     resolution: {integrity: sha512-DIS8z4PfJRbIyfVFDVnK9rO3eYDtse4Omcm6bt0oEr5/jtLgysmjuBl1frJ9E/EQZrFmKx2A8m/s5s9CRXIzhw==}
@@ -3233,8 +3206,6 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  cookie@1.0.2: {}
-
   css-box-model@1.2.1:
     dependencies:
       tiny-invariant: 1.3.3
@@ -3548,20 +3519,6 @@ snapshots:
       react: 18.0.0
       react-dom: 18.0.0(react@18.0.0)
 
-  react-router-dom@7.9.2(react-dom@18.0.0(react@18.0.0))(react@18.0.0):
-    dependencies:
-      react: 18.0.0
-      react-dom: 18.0.0(react@18.0.0)
-      react-router: 7.9.2(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
-
-  react-router@7.9.2(react-dom@18.0.0(react@18.0.0))(react@18.0.0):
-    dependencies:
-      cookie: 1.0.2
-      react: 18.0.0
-      set-cookie-parser: 2.7.1
-    optionalDependencies:
-      react-dom: 18.0.0(react@18.0.0)
-
   react-style-singleton@2.2.3(@types/react@18.0.0)(react@18.0.0):
     dependencies:
       get-nonce: 1.0.1
@@ -3609,8 +3566,6 @@ snapshots:
   scheduler@0.21.0:
     dependencies:
       loose-envify: 1.4.0
-
-  set-cookie-parser@2.7.1: {}
 
   sonner@1.7.4(react-dom@18.0.0(react@18.0.0))(react@18.0.0):
     dependencies:
