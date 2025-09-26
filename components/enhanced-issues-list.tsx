@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { format } from "date-fns"
-import { Link } from "react-router-dom"
 import { Search, ChevronDown, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -242,9 +241,12 @@ export function EnhancedIssuesList({
                         />
                       </TableCell>
                       <TableCell className="p-4">
-                        <Link to={`/issue/${issue.id}`} className="hover:underline">
+                        <span
+                          onClick={() => handleEditIssue(issue.id)}
+                          className="hover:underline cursor-pointer text-primary"
+                        >
                           {issue.title}
-                        </Link>
+                        </span>
                       </TableCell>
                       <TableCell className="p-4">{issue.priority}</TableCell>
                       <TableCell className="p-4">{issue.status}</TableCell>
