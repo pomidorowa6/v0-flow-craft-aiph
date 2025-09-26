@@ -466,13 +466,9 @@ export function EnhancedIssuesList({
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => onDeleteIssue(issue.id)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Delete
-                          </AlertDialogAction>
+                          <AlertDialogAction>Cancel</AlertDialogAction>
+                          <AlertDialogCancel onClick={() => onDeleteIssue(issue.id)}>
+                            Delete</AlertDialogCancel>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
