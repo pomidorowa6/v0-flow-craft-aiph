@@ -94,7 +94,9 @@ export function Navigation({
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center w-16 h-[72px] px-3 justify-center">
+          <div
+            className={cn("flex items-center h-[72px] px-3 justify-center", isMobile || isExpanded ? "w-full" : "w-16")}
+          >
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
                 <Image src="/images/flowcraft-logo.png" alt="FlowCraft" width={32} height={32} className="rounded-lg" />
