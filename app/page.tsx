@@ -294,7 +294,7 @@ export default function TaskFlowApp() {
           className={`${isMobile ? "p-0" : "p-4"} min-h-screen ${isMobile ? "pl-0 pt-0 pb-0 pr-0" : "pl-0 pt-4 pb-4 pr-4"} mx-0`}
         >
           <main
-            className={`bg-background ${isMobile ? "min-h-screen" : "rounded-xl shadow-lg border-border h-[calc(100vh-2rem)]"} flex flex-col overflow-hidden ${isMobile ? "border-0" : "border-0 border-none"}`}
+            className={`bg-background ${isMobile ? "min-h-screen" : "rounded-xl shadow-lg border-border h-[calc(100vh-2rem)]"} flex flex-col ${isMobile ? "border-0" : "border-0 border-none"}`}
           >
             <HeaderBar
               currentView={currentView}
@@ -307,7 +307,7 @@ export default function TaskFlowApp() {
               onMarkAllAsRead={markAllAsRead}
             />
 
-            <div className="flex-1 overflow-hidden p-6 px-4 py-4">{renderCurrentView()}</div>
+            <div className="flex-1 overflow-auto p-6 px-4 py-4">{renderCurrentView()}</div>
           </main>
         </div>
       </div>
