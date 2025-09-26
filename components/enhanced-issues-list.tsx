@@ -198,12 +198,12 @@ export function EnhancedIssuesList({
         </div>
       </div>
 
-      <div className="border rounded-lg flex flex-col h-[calc(100vh-300px)]">
+      <div className="border flex flex-col h-[calc(100vh-300px)] items-stretch w-auto rounded-lg">
         <div className="flex-1 overflow-hidden">
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-background">
               <TableRow>
-                <TableHead className="w-12">
+                <TableHead className="w-12 rounded-lg">
                   <Checkbox
                     checked={
                       selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
@@ -296,7 +296,7 @@ export function EnhancedIssuesList({
                 </TableHead>
                 <TableHead>Sprint</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead className="w-20">Actions</TableHead>
+                <TableHead className="w-20 rounded-lg">Actions</TableHead>
               </TableRow>
             </TableHeader>
           </Table>
