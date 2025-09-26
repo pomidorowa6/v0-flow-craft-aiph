@@ -264,7 +264,7 @@ export function EnhancedIssuesList({
                       aria-label="Select all issues"
                     />
                   </TableHead>
-                  <TableHead className="min-w-[200px] w-[200px] bg-background border-r">
+                  <TableHead className="min-w-[200px] w-[200px] bg-background border-r-0">
                     <div className="flex items-center space-x-2">
                       <div className="relative flex-1 min-w-[150px]">
                         <Input
@@ -290,7 +290,7 @@ export function EnhancedIssuesList({
                         aria-label={`Select issue ${issue.title}`}
                       />
                     </TableCell>
-                    <TableCell className="border-r">
+                    <TableCell className="border-r-0">
                       <div>
                         <div className="font-medium">{issue.title}</div>
                         <div className="text-sm text-muted-foreground">{issue.id}</div>
