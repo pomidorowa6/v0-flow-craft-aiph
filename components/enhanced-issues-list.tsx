@@ -248,143 +248,49 @@ export function EnhancedIssuesList({
 
       {/* === ISSUES TABLE === */}
       {/* Main data table with integrated filters and sticky header */}
-      <div className="border rounded-lg flex flex-col max-h-[calc(100vh-300px)]">
-        <div className="flex-1 overflow-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10 border-b">
-              <TableRow>
-                <TableHead className="w-12 bg-background">
-                  <Checkbox
-                    checked={
-                      selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
-                    }
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all issues"
-                  />
-                </TableHead>
-                <TableHead className="min-w-[200px] bg-background">
-                  <div className="flex items-center space-x-2">
-                    <div className="relative flex-1 min-w-[150px]">
-                      <Input
-                        placeholder="Issue"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-7 h-8 text-xs font-medium border-none bg-transparent hover:bg-muted/50 focus:bg-background"
-                        aria-label="Search issues"
-                      />
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+      <div className="border rounded-lg flex flex-col h-full">
+        <div className="flex-1 overflow-hidden relative">
+          {/* Sticky columns container */}
+          <div className="absolute left-0 top-0 z-20 bg-background border-r">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-30 border-b">
+                <TableRow>
+                  <TableHead className="w-12 bg-background border-r">
+                    <Checkbox
+                      checked={
+                        selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
+                      }
+                      onCheckedChange={handleSelectAll}
+                      aria-label="Select all issues"
+                    />
+                  </TableHead>
+                  <TableHead className="min-w-[200px] w-[200px] bg-background border-r">
+                    <div className="flex items-center space-x-2">
+                      <div className="relative flex-1 min-w-[150px]">
+                        <Input
+                          placeholder="Issue"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-7 h-8 text-xs font-medium border-none bg-transparent hover:bg-muted/50 focus:bg-background"
+                          aria-label="Search issues"
+                        />
+                        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                      </div>
                     </div>
-                  </div>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by priority"
-                    >
-                      <div className="flex items-center">
-                        <span>Priority</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Priority</SelectItem>
-                      <SelectItem value="P0">P0 - Critical</SelectItem>
-                      <SelectItem value="P1">P1 - High</SelectItem>
-                      <SelectItem value="P2">P2 - Medium</SelectItem>
-                      <SelectItem value="P3">P3 - Low</SelectItem>
-                      <SelectItem value="P4">P4 - Lowest</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by status"
-                    >
-                      <div className="flex items-center">
-                        <span>Status</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="In Review">In Review</SelectItem>
-                      <SelectItem value="Done">Done</SelectItem>
-                      <SelectItem value="Blocked">Blocked</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select
-                    value={businessImpactFilter}
-                    onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
-                  >
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by business impact"
-                    >
-                      <div className="flex items-center">
-                        <span>Impact</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Impact</SelectItem>
-                      <SelectItem value="Critical">Critical</SelectItem>
-                      <SelectItem value="High">High</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="Low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select value={teamFilter} onValueChange={setTeamFilter}>
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by team"
-                    >
-                      <div className="flex items-center">
-                        <span>Team</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Teams</SelectItem>
-                      {teams.map((team) => (
-                        <SelectItem key={team.id} value={team.id}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="bg-background">
-                  <span className="text-xs font-medium text-foreground">Sprint</span>
-                </TableHead>
-                <TableHead className="bg-background">
-                  <span className="text-xs font-medium text-foreground">Created</span>
-                </TableHead>
-                <TableHead className="w-20 bg-background">
-                  <span className="text-xs font-medium text-foreground">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedIssues.map((issue) => {
-                const team = teams.find((t) => t.id === issue.teamId)
-                const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
-                const sprint = sprints.find((s) => s.id === issue.sprintId)
-
-                return (
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedIssues.map((issue) => (
                   <TableRow key={issue.id}>
-                    <TableCell>
+                    <TableCell className="border-r">
                       <Checkbox
                         checked={selectedIssues.has(issue.id)}
                         onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
                         aria-label={`Select issue ${issue.title}`}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="border-r">
                       <div>
                         <div className="font-medium">{issue.title}</div>
                         <div className="text-sm text-muted-foreground">{issue.id}</div>
@@ -395,94 +301,210 @@ export function EnhancedIssuesList({
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityColor(issue.priority)} variant="outline">
-                        {issue.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(issue.status)} variant="outline">
-                        {issue.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getImpactColor(issue.businessImpact)} variant="outline">
-                        {issue.businessImpact}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{team?.name || "Unassigned"}</div>
-                        <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {sprint ? (
-                        <div>
-                          <div className="font-medium">{sprint.no}</div>
-                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
-                        </div>
-                      ) : (
-                        "No Sprint"
-                      )}
-                    </TableCell>
-                    <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-1">
-                        <EnhancedIssueForm
-                          issue={issue}
-                          sprints={sprints}
-                          teams={teams}
-                          teamMembers={teamMembers}
-                          onSubmit={onEditIssue}
-                          onCancel={() => {}}
-                          trigger={
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              aria-label={`Edit issue ${issue.title}`}
-                            >
-                              <Edit className="h-3 w-3 text-foreground" />
-                            </Button>
-                          }
-                        />
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                              aria-label={`Delete issue ${issue.title}`}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. Are you sure you want to delete "{issue.title}"?
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => onDeleteIssue(issue.id)}
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
                   </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Scrollable columns container */}
+          <div className="overflow-x-auto ml-[252px]">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10 border-b">
+                <TableRow>
+                  <TableHead className="min-w-[120px] bg-background">
+                    <Select
+                      value={priorityFilter}
+                      onValueChange={(value: Priority | "all") => setPriorityFilter(value)}
+                    >
+                      <SelectTrigger
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        aria-label="Filter by priority"
+                      >
+                        <div className="flex items-center">
+                          <span>Priority</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Priority</SelectItem>
+                        <SelectItem value="P0">P0 - Critical</SelectItem>
+                        <SelectItem value="P1">P1 - High</SelectItem>
+                        <SelectItem value="P2">P2 - Medium</SelectItem>
+                        <SelectItem value="P3">P3 - Low</SelectItem>
+                        <SelectItem value="P4">P4 - Lowest</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] bg-background">
+                    <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
+                      <SelectTrigger
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        aria-label="Filter by status"
+                      >
+                        <div className="flex items-center">
+                          <span>Status</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="Todo">Todo</SelectItem>
+                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="In Review">In Review</SelectItem>
+                        <SelectItem value="Done">Done</SelectItem>
+                        <SelectItem value="Blocked">Blocked</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] bg-background">
+                    <Select
+                      value={businessImpactFilter}
+                      onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
+                    >
+                      <SelectTrigger
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        aria-label="Filter by business impact"
+                      >
+                        <div className="flex items-center">
+                          <span>Impact</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Impact</SelectItem>
+                        <SelectItem value="Critical">Critical</SelectItem>
+                        <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] bg-background">
+                    <Select value={teamFilter} onValueChange={setTeamFilter}>
+                      <SelectTrigger
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        aria-label="Filter by team"
+                      >
+                        <div className="flex items-center">
+                          <span>Team</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Teams</SelectItem>
+                        {teams.map((team) => (
+                          <SelectItem key={team.id} value={team.id}>
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] bg-background">
+                    <span className="text-xs font-medium text-foreground">Sprint</span>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] bg-background">
+                    <span className="text-xs font-medium text-foreground">Created</span>
+                  </TableHead>
+                  <TableHead className="w-20 bg-background">
+                    <span className="text-xs font-medium text-foreground">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedIssues.map((issue) => {
+                  const team = teams.find((t) => t.id === issue.teamId)
+                  const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
+                  const sprint = sprints.find((s) => s.id === issue.sprintId)
+
+                  return (
+                    <TableRow key={issue.id}>
+                      <TableCell>
+                        <Badge className={getPriorityColor(issue.priority)} variant="outline">
+                          {issue.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(issue.status)} variant="outline">
+                          {issue.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getImpactColor(issue.businessImpact)} variant="outline">
+                          {issue.businessImpact}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{team?.name || "Unassigned"}</div>
+                          <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {sprint ? (
+                          <div>
+                            <div className="font-medium">{sprint.no}</div>
+                            <div className="text-sm text-muted-foreground">{sprint.title}</div>
+                          </div>
+                        ) : (
+                          "No Sprint"
+                        )}
+                      </TableCell>
+                      <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-1">
+                          <EnhancedIssueForm
+                            issue={issue}
+                            sprints={sprints}
+                            teams={teams}
+                            teamMembers={teamMembers}
+                            onSubmit={onEditIssue}
+                            onCancel={() => {}}
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                aria-label={`Edit issue ${issue.title}`}
+                              >
+                                <Edit className="h-3 w-3 text-foreground" />
+                              </Button>
+                            }
+                          />
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                aria-label={`Delete issue ${issue.title}`}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. Are you sure you want to delete "{issue.title}"?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => onDeleteIssue(issue.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
         {/* === BULK OPERATIONS BAR === */}

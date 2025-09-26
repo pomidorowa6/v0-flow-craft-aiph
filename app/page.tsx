@@ -293,7 +293,7 @@ export default function TaskFlowApp() {
               onMarkAllAsRead={markAllAsRead}
             />
 
-            <div className="flex-1 overflow-auto p-6 px-4 py-4">{renderCurrentView()}</div>
+            <div className="flex-1 overflow-hidden">{renderCurrentView()}</div>
           </main>
         </div>
       </div>
