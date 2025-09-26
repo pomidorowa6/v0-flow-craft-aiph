@@ -255,7 +255,7 @@ export function EnhancedIssuesList({
             <Table>
               <TableHeader className="sticky top-0 bg-background z-30 border-b">
                 <TableRow>
-                  <TableHead className="w-12 bg-background border-r">
+                  <TableHead className="bg-background w-8 border-r-0">
                     <Checkbox
                       checked={
                         selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
@@ -283,7 +283,7 @@ export function EnhancedIssuesList({
               <TableBody>
                 {filteredAndSortedIssues.map((issue) => (
                   <TableRow key={issue.id}>
-                    <TableCell className="border-r">
+                    <TableCell className="border-r-0">
                       <Checkbox
                         checked={selectedIssues.has(issue.id)}
                         onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
