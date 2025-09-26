@@ -4,11 +4,11 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Users, Target } from "lucide-react"
 import { KanbanBoard } from "./kanban-board"
-import type { EnhancedIssue, Sprint, IssueStatus } from "@/types"
+import type { Issue, Sprint, IssueStatus } from "@/types"
 
 interface CurrentSprintViewProps {
   sprint: Sprint | null
-  issues: EnhancedIssue[]
+  issues: Issue[]
   onUpdateIssueStatus: (issueId: string, newStatus: IssueStatus) => void
 }
 
@@ -53,11 +53,13 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
 
   return (
     <div className="space-y-6">
+      
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="flex flex-row items-center gap-3">
-              <Target className="h-5 w-5" />
+              <Target className="h-5 w-5" /> 
               <div className="flex flex-col items-start gap-1 justify-stretch">
                 Sprint {sprint.no}
                 <p className="text-m text-muted-foreground">{sprint.title}</p>
@@ -121,6 +123,7 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
           )}
         </CardContent>
       </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-5 gap-5 py-4 border-b border-none">
         <div className="text-center">
           <div className="text-2xl font-bold text-gray-600">{sprintIssues.filter((i) => i.status === "Todo").length}</div>
@@ -139,7 +142,46 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
           <div className="text-muted-foreground text-sm">Completed</div>
         </div>
       </div>
-      
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-600">
+                {sprintIssues.filter((i) => i.status === "Todo").length}
+              </div>
+              <div className="text-sm text-muted-foreground">Todo</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{inProgressIssues.length}</div>
+              <div className="text-sm text-muted-foreground">In Progress</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">{inReviewIssues.length}</div>
+              <div className="text-sm text-muted-foreground">In Review</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{completedIssues.length}</div>
+              <div className="text-sm text-muted-foreground">Done</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <KanbanBoard sprint={sprint} issues={issues} onUpdateIssueStatus={onUpdateIssueStatus} />
     </div>

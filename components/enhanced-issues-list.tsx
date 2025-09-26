@@ -200,6 +200,7 @@ export function EnhancedIssuesList({
             />
           </div>
       </div>
+
       <div className="border rounded-lg">
         <div className="flex items-center justify-between p-4 border-b bg-muted/20">
           <div className="relative flex-1 mr-4">
