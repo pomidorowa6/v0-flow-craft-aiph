@@ -484,7 +484,7 @@ export function EnhancedIssuesList({
                         onCancel={() => {}}
                         trigger={
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <Edit className="h-3 w-3" />
+                            <Edit className="h-3 w-3 text-foreground" />
                           </Button>
                         }
                       />
@@ -494,7 +494,7 @@ export function EnhancedIssuesList({
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                         onClick={() => onDeleteIssue(issue.id)}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3 w-3 text-foreground" />
                       </Button>
                     </div>
                   </TableCell>
