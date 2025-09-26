@@ -206,13 +206,7 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Cross-Team Dependencies</h2>
-          <p className="text-muted-foreground">Track and manage dependencies between teams</p>
-        </div>
-        
-      </div>
+      
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -266,13 +260,13 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
       </div>
 
       <Tabs defaultValue="dependencies" className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-8">
           <TabsList>
             <TabsTrigger value="dependencies">Dependencies Map</TabsTrigger>
             <TabsTrigger value="chains">Dependency Chains</TabsTrigger>
             <TabsTrigger value="critical">Critical Path</TabsTrigger>
           </TabsList>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 flex-row">
             <Select value={selectedTeam} onValueChange={setSelectedTeam}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Select team" />
