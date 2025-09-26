@@ -198,7 +198,7 @@ export function EnhancedIssuesList({
         </div>
       </div>
 
-      <div className="border flex flex-col h-[calc(100vh-300px)] items-stretch w-auto rounded-lg">
+      <div className="border flex flex-col h-[calc(100vh-300px)] items-stretch w-auto rounded-lg h-auto">
         <div className="flex-1 overflow-hidden">
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-background">
