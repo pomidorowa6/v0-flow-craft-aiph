@@ -96,7 +96,7 @@ export function Navigation({
         <div className="flex flex-col h-full">
           <div
             className={cn(
-              "flex items-center h-[72px] px-4 text-left justify-start",
+              "flex items-center h-[72px] px-4 text-left justify-start mx-0",
               isMobile || isExpanded ? "w-full" : "w-16",
             )}
           >

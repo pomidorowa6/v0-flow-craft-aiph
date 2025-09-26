@@ -82,10 +82,10 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.439 0 0);
   --shadow-x: 0px;
-  --shadow-y: 1px;
+  --shadow-y: 2px;
   --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.05;
+  --shadow-spread: 1px;
+  --shadow-opacity: 0.15;
   --shadow-color: #000000;
 }
 
