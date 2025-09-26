@@ -291,10 +291,10 @@ export default function TaskFlowApp() {
 
       <div className={`transition-all duration-300 ${!isMobile && (isSidebarExpanded ? "ml-64" : "ml-16")}`}>
         <div
-          className={`${isMobile ? "p-0" : "p-4"} min-h-screen ${isMobile ? "pl-0 pt-0 pb-0 pr-0" : "pl-0 pt-4 pb-4 pr-4"} mx-0`}
+          className={`${isMobile ? "p-0" : "p-4"} min-h-screen ${isMobile ? "pl-0 pt-0 pb-0 pr-0" : "pl-1 pt-4 pb-4 pr-4"} mx-0`}
         >
           <main
-            className={`bg-background ${isMobile ? "min-h-screen" : "rounded-xl shadow-lg border-border h-[calc(100vh-2rem)]"} flex flex-col ${isMobile ? "border-0" : "border-0 border-none"}`}
+            className={`bg-background ${isMobile ? "min-h-screen" : "rounded-xl shadow-lg border-border h-[calc(100vh-2rem)]"} flex flex-col overflow-hidden ${isMobile ? "border-0" : "border-0 border-none"}`}
           >
             <HeaderBar
               currentView={currentView}
