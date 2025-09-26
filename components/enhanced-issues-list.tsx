@@ -248,8 +248,8 @@ export function EnhancedIssuesList({
 
       {/* === ISSUES TABLE === */}
       {/* Main data table with integrated filters and sticky header */}
-      <div className="flex-1 min-h-0 border rounded-lg flex flex-col">
-        <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-h-0 border rounded-lg flex-1 overflow-auto">
+        <div>
           <Table>
             <TableHeader className="sticky top-0 bg-background z-10 border-b">
               <TableRow>
