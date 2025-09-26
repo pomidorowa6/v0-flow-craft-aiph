@@ -249,7 +249,7 @@ export function EnhancedIssuesList({
                     <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
                       <div className="flex items-center">
                         <span>Status</span>
-                        <ChevronDown className="h-3 w-3 ml-1" />
+                        
                       </div>
                     </SelectTrigger>
                     <SelectContent>
@@ -270,7 +270,7 @@ export function EnhancedIssuesList({
                     <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
                       <div className="flex items-center">
                         <span>Impact</span>
-                        <ChevronDown className="h-3 w-3 ml-1" />
+                        
                       </div>
                     </SelectTrigger>
                     <SelectContent>
@@ -287,7 +287,7 @@ export function EnhancedIssuesList({
                     <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
                       <div className="flex items-center">
                         <span>Team</span>
-                        <ChevronDown className="h-3 w-3 ml-1" />
+                        
                       </div>
                     </SelectTrigger>
                     <SelectContent>
