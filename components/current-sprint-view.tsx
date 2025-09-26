@@ -53,7 +53,7 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-5 py-4 border-b border-none">
+      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
         <div className="text-center">
           <div className="text-2xl font-bold">{sprintIssues.length}</div>
           <div className="text-muted-foreground text-sm">Total Issues</div>
