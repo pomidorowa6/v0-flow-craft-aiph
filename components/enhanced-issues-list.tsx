@@ -207,7 +207,7 @@ export function EnhancedIssuesList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-4 px-4">
       {/* === STATISTICS OVERVIEW === */}
       {/* Summary cards showing key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
