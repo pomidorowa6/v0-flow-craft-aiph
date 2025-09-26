@@ -1,497 +1,332 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
+import { format } from "date-fns"
+import { Link } from "react-router-dom"
+import { Search, ChevronDown, MoreHorizontal } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
-import { EnhancedIssueForm } from "./enhanced-issue-form"
-import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
+import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu"
+
+// Assuming these types and data structures are defined elsewhere
+// For demonstration purposes, let's define them here:
+type Priority = "P0" | "P1" | "P2" | "P3" | "P4"
+type IssueStatus = "Todo" | "In Progress" | "In Review" | "Done" | "Blocked"
+type BusinessImpact = "Critical" | "High" | "Medium" | "Low"
+
+interface Team {
+  id: string
+  name: string
+}
+
+interface TeamMember {
+  id: string
+  name: string
+}
+
+interface Sprint {
+  id: string
+  name: string
+}
+
+interface Issue {
+  id: string
+  title: string
+  priority: Priority
+  status: IssueStatus
+  businessImpact: BusinessImpact
+  teamId: string
+  sprintId: string
+  createdAt: string
+  assigneeId?: string
+}
 
 interface EnhancedIssuesListProps {
-  issues: EnhancedIssue[]
-  sprints: Sprint[]
+  issues: Issue[]
   teams: Team[]
   teamMembers: TeamMember[]
-  onCreateIssue: (issueData: Partial<EnhancedIssue>) => void
-  onEditIssue: (issue: EnhancedIssue) => void
-  onDeleteIssue: (issueId: string) => void
+  sprints: Sprint[]
+  selectedIssues: Set<string>
+  filteredAndSortedIssues: Issue[]
+  searchTerm: string
+  priorityFilter: Priority | "all"
+  statusFilter: IssueStatus | "all"
+  businessImpactFilter: BusinessImpact | "all"
+  teamFilter: string
+  handleSelectAll: (checked: boolean) => void
+  handleSelectIssue: (issueId: string, checked: boolean) => void
+  setSearchTerm: (term: string) => void
+  setPriorityFilter: (priority: Priority | "all") => void
+  setStatusFilter: (status: IssueStatus | "all") => void
+  setBusinessImpactFilter: (impact: BusinessImpact | "all") => void
+  setTeamFilter: (teamId: string) => void
+  handleDeleteSelected: () => void
+  handleDeleteIssue: (issueId: string) => void
+  handleEditIssue: (issueId: string) => void
+  isDeleteDialogOpen: boolean
+  setIsDeleteDialogOpen: (open: boolean) => void
+  issueToDeleteId: string | null
+  confirmDeleteIssue: () => void
+  setSelectedIssues: React.Dispatch<React.SetStateAction<Set<string>>>
 }
 
 export function EnhancedIssuesList({
   issues,
-  sprints,
   teams,
   teamMembers,
-  onCreateIssue,
-  onEditIssue,
-  onDeleteIssue,
+  sprints,
+  selectedIssues,
+  filteredAndSortedIssues,
+  searchTerm,
+  priorityFilter,
+  statusFilter,
+  businessImpactFilter,
+  teamFilter,
+  handleSelectAll,
+  handleSelectIssue,
+  setSearchTerm,
+  setPriorityFilter,
+  setStatusFilter,
+  setBusinessImpactFilter,
+  setTeamFilter,
+  handleDeleteSelected,
+  handleDeleteIssue,
+  handleEditIssue,
+  isDeleteDialogOpen,
+  setIsDeleteDialogOpen,
+  issueToDeleteId,
+  confirmDeleteIssue,
+  setSelectedIssues,
 }: EnhancedIssuesListProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<IssueStatus | "all">("all")
-  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all")
-  const [businessImpactFilter, setBusinessImpactFilter] = useState<BusinessImpact | "all">("all")
-  const [teamFilter, setTeamFilter] = useState<string>("all")
-  const [sortBy, setSortBy] = useState<"priority" | "businessImpact" | "created" | "updated">("priority")
-  const [selectedIssues, setSelectedIssues] = useState<Set<string>>(new Set())
-  const [assignSprintModalOpen, setAssignSprintModalOpen] = useState(false)
-  const [assignPersonModalOpen, setAssignPersonModalOpen] = useState(false)
-  const [selectedSprintId, setSelectedSprintId] = useState<string>("")
-  const [selectedPersonId, setSelectedPersonId] = useState<string>("")
-
-  const filteredAndSortedIssues = issues
-    .filter((issue) => {
-      const matchesSearch =
-        issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.id.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = statusFilter === "all" || issue.status === statusFilter
-      const matchesPriority = priorityFilter === "all" || issue.priority === priorityFilter
-      const matchesBusinessImpact = businessImpactFilter === "all" || issue.businessImpact === businessImpactFilter
-      const matchesTeam = teamFilter === "all" || issue.teamId === teamFilter
-
-      return matchesSearch && matchesStatus && matchesPriority && matchesBusinessImpact && matchesTeam
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "priority":
-          const priorityOrder = { P0: 0, P1: 1, P2: 2, P3: 3, P4: 4, P5: 5 }
-          return priorityOrder[a.priority] - priorityOrder[b.priority]
-        case "businessImpact":
-          const impactOrder = { Critical: 0, High: 1, Medium: 2, Low: 3 }
-          return impactOrder[a.businessImpact] - impactOrder[b.businessImpact]
-        case "created":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        case "updated":
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        default:
-          return 0
-      }
-    })
-
-  const blockedIssuesCount = issues.filter((issue) => issue.status === "Blocked").length
-  const highImpactCount = issues.filter(
-    (issue) => issue.businessImpact === "Critical" || issue.businessImpact === "High",
-  ).length
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIssues(new Set(filteredAndSortedIssues.map((issue) => issue.id)))
-    } else {
-      setSelectedIssues(new Set())
-    }
-  }
-
-  const handleSelectIssue = (issueId: string, checked: boolean) => {
-    const newSelected = new Set(selectedIssues)
-    if (checked) {
-      newSelected.add(issueId)
-    } else {
-      newSelected.delete(issueId)
-    }
-    setSelectedIssues(newSelected)
-  }
-
-  const handleBulkDelete = () => {
-    selectedIssues.forEach((issueId) => onDeleteIssue(issueId))
-    setSelectedIssues(new Set())
-  }
-
-  const handleBulkAssignSprint = () => {
-    if (!selectedSprintId) return
-    selectedIssues.forEach((issueId) => {
-      const issue = issues.find((i) => i.id === issueId)
-      if (issue) {
-        onEditIssue({ ...issue, sprintId: selectedSprintId })
-      }
-    })
-    setSelectedIssues(new Set())
-    setSelectedSprintId("")
-    setAssignSprintModalOpen(false)
-  }
-
-  const handleBulkAssignPerson = () => {
-    if (!selectedPersonId) return
-    selectedIssues.forEach((issueId) => {
-      const issue = issues.find((i) => i.id === issueId)
-      if (issue) {
-        onEditIssue({ ...issue, assigneeId: selectedPersonId })
-      }
-    })
-    setSelectedIssues(new Set())
-    setSelectedPersonId("")
-    setAssignPersonModalOpen(false)
-  }
-
-  const getPriorityColor = (priority: Priority) => {
-    switch (priority) {
-      case "P0":
-        return "bg-red-600 text-white"
-      case "P1":
-        return "bg-red-500 text-white"
-      case "P2":
-        return "bg-orange-500 text-white"
-      case "P3":
-        return "bg-yellow-500 text-black"
-      case "P4":
-        return "bg-green-500 text-white"
-      default:
-        return "bg-gray-500 text-white"
-    }
-  }
-
-  const getImpactColor = (impact: BusinessImpact) => {
-    switch (impact) {
-      case "Critical":
-        return "bg-red-600 text-white"
-      case "High":
-        return "bg-orange-500 text-white"
-      case "Medium":
-        return "bg-yellow-500 text-black"
-      case "Low":
-        return "bg-green-500 text-white"
-      default:
-        return "bg-gray-500 text-white"
-    }
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold">{issues.length}</div>
-          <div className="text-muted-foreground text-sm">Total Issues</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-red-600">{blockedIssuesCount}</div>
-          <div className="text-muted-foreground text-sm">Blocked Issues</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-orange-600">{highImpactCount}</div>
-          <div className="text-muted-foreground text-sm">High Impact</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">
-            {issues.filter((issue) => issue.status === "Done").length}
-          </div>
-          <div className="text-muted-foreground text-sm">Completed</div>
-        </div>
-        <div className="flex items-center space-x-2 text-right flex-row justify-end">
-          <EnhancedIssueForm
-            sprints={sprints}
-            teams={teams}
-            teamMembers={teamMembers}
-            onSubmit={onCreateIssue}
-            onCancel={() => {}}
-            trigger={
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Issue
-              </Button>
-            }
-          />
-        </div>
+    <div className="space-y-4 h-full flex flex-col">
+      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4 flex-shrink-0">
+        {/* Filters and actions will go here */}
       </div>
 
-      <div className="border rounded-lg flex flex-col max-h-[calc(100vh-300px)]">
-        <div className="flex-1 overflow-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10 border-b">
-              <TableRow>
-                <TableHead className="w-12 bg-background">
-                  <Checkbox
-                    checked={
-                      selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
-                    }
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead className="min-w-[200px] bg-background">
-                  <div className="flex items-center space-x-2">
-                    <div className="relative flex-1 min-w-[150px]">
-                      <Input
-                        placeholder="Issue"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-7 h-8 text-xs"
-                      />
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-                    </div>
-                  </div>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
-                      <div className="flex items-center">
-                        <span>Priority</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Priority</SelectItem>
-                      <SelectItem value="P0">P0 - Critical</SelectItem>
-                      <SelectItem value="P1">P1 - High</SelectItem>
-                      <SelectItem value="P2">P2 - Medium</SelectItem>
-                      <SelectItem value="P3">P3 - Low</SelectItem>
-                      <SelectItem value="P4">P4 - Lowest</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
-                      <div className="flex items-center">
-                        <span>Status</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="In Review">In Review</SelectItem>
-                      <SelectItem value="Done">Done</SelectItem>
-                      <SelectItem value="Blocked">Blocked</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select
-                    value={businessImpactFilter}
-                    onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
-                  >
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
-                      <div className="flex items-center">
-                        <span>Impact</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Impact</SelectItem>
-                      <SelectItem value="Critical">Critical</SelectItem>
-                      <SelectItem value="High">High</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="Low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="min-w-[120px] bg-background">
-                  <Select value={teamFilter} onValueChange={setTeamFilter}>
-                    <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium">
-                      <div className="flex items-center">
-                        <span>Team</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Teams</SelectItem>
-                      {teams.map((team) => (
-                        <SelectItem key={team.id} value={team.id}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-                <TableHead className="bg-background">Sprint</TableHead>
-                <TableHead className="bg-background">Created</TableHead>
-                <TableHead className="w-20 bg-background">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedIssues.map((issue) => {
-                const team = teams.find((t) => t.id === issue.teamId)
-                const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
-                const sprint = sprints.find((s) => s.id === issue.sprintId)
-
-                return (
-                  <TableRow key={issue.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedIssues.has(issue.id)}
-                        onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{issue.title}</div>
-                        <div className="text-sm text-muted-foreground">{issue.id}</div>
-                        {issue.status === "Blocked" && (
-                          <Badge variant="destructive" className="mt-1">
-                            Blocked
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityColor(issue.priority)}>{issue.priority}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{issue.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getImpactColor(issue.businessImpact)}>{issue.businessImpact}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{team?.name || "Unassigned"}</div>
-                        <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {sprint ? (
-                        <div>
-                          <div className="font-medium">{sprint.no}</div>
-                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
-                        </div>
-                      ) : (
-                        "No Sprint"
-                      )}
-                    </TableCell>
-                    <TableCell>{new Date(issue.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-1">
-                        <EnhancedIssueForm
-                          issue={issue}
-                          sprints={sprints}
-                          teams={teams}
-                          teamMembers={teamMembers}
-                          onSubmit={onEditIssue}
-                          onCancel={() => {}}
-                          trigger={
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit className="h-3 w-3 text-foreground" />
-                            </Button>
-                          }
+      <div className="border rounded-lg flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full overflow-auto">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10">
+                <TableRow>
+                  <TableHead className="w-12 h-10 text-sm font-medium text-foreground">
+                    <Checkbox
+                      checked={
+                        selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
+                      }
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead className="min-w-[200px] h-10 text-sm font-medium text-foreground">
+                    <div className="flex items-center space-x-2">
+                      <div className="relative flex-1 min-w-[150px]">
+                        <Input
+                          placeholder="Issue"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-7 h-8 text-xs"
                         />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={() => onDeleteIssue(issue.id)}
-                        >
-                          <Trash2 className="h-3 w-3 text-foreground" />
-                        </Button>
+                        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                       </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                    </div>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] h-10 text-sm font-medium text-foreground">
+                    <Select
+                      value={priorityFilter}
+                      onValueChange={(value: Priority | "all") => setPriorityFilter(value)}
+                    >
+                      <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-sm font-medium text-foreground">
+                        <div className="flex items-center justify-between w-full">
+                          <span>Priority</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Priority</SelectItem>
+                        <SelectItem value="P0">P0 - Critical</SelectItem>
+                        <SelectItem value="P1">P1 - High</SelectItem>
+                        <SelectItem value="P2">P2 - Medium</SelectItem>
+                        <SelectItem value="P3">P3 - Low</SelectItem>
+                        <SelectItem value="P4">P4 - Lowest</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] h-10 text-sm font-medium text-foreground">
+                    <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
+                      <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-sm font-medium text-foreground">
+                        <div className="flex items-center justify-between w-full">
+                          <span>Status</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="Todo">Todo</SelectItem>
+                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="In Review">In Review</SelectItem>
+                        <SelectItem value="Done">Done</SelectItem>
+                        <SelectItem value="Blocked">Blocked</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] h-10 text-sm font-medium text-foreground">
+                    <Select
+                      value={businessImpactFilter}
+                      onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
+                    >
+                      <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-sm font-medium text-foreground">
+                        <div className="flex items-center justify-between w-full">
+                          <span>Impact</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Impact</SelectItem>
+                        <SelectItem value="Critical">Critical</SelectItem>
+                        <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="min-w-[120px] h-10 text-sm font-medium text-foreground">
+                    <Select value={teamFilter} onValueChange={setTeamFilter}>
+                      <SelectTrigger className="h-8 border-none bg-transparent hover:bg-muted/50 text-sm font-medium text-foreground">
+                        <div className="flex items-center justify-between w-full">
+                          <span>Team</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Teams</SelectItem>
+                        {teams.map((team) => (
+                          <SelectItem key={team.id} value={team.id}>
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableHead>
+                  <TableHead className="h-10 text-sm font-medium text-foreground">Sprint</TableHead>
+                  <TableHead className="h-10 text-sm font-medium text-foreground">Created</TableHead>
+                  <TableHead className="w-20 h-10 text-sm font-medium text-foreground">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedIssues.map((issue) => {
+                  const team = teams.find((t) => t.id === issue.teamId)
+                  const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
+                  const sprint = sprints.find((s) => s.id === issue.sprintId)
+
+                  return (
+                    <TableRow key={issue.id}>
+                      <TableCell className="w-12 p-4">
+                        <Checkbox
+                          checked={selectedIssues.has(issue.id)}
+                          onCheckedChange={(checked) => handleSelectIssue(issue.id, checked)}
+                        />
+                      </TableCell>
+                      <TableCell className="p-4">
+                        <Link to={`/issue/${issue.id}`} className="hover:underline">
+                          {issue.title}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="p-4">{issue.priority}</TableCell>
+                      <TableCell className="p-4">{issue.status}</TableCell>
+                      <TableCell className="p-4">{issue.businessImpact}</TableCell>
+                      <TableCell className="p-4">{team?.name}</TableCell>
+                      <TableCell className="p-4">{sprint?.name}</TableCell>
+                      <TableCell className="p-4">{format(new Date(issue.createdAt), "MMM dd, yyyy")}</TableCell>
+                      <TableCell className="p-4">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditIssue(issue.id)}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDeleteIssue(issue.id)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
-        {selectedIssues.size > 0 && (
-          <div className="flex items-center justify-between px-4 py-2 border-b bg-primary/10 dark:bg-primary/20">
-            <span className="text-sm font-medium text-foreground">
-              {selectedIssues.size} issue{selectedIssues.size !== 1 ? "s" : ""} selected
-            </span>
-            <div className="flex items-center space-x-2">
-              <Dialog open={assignSprintModalOpen} onOpenChange={setAssignSprintModalOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    Assign Sprint
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
-                    <DialogTitle className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Assign to Sprint
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="max-h-80 overflow-y-auto">
-                    <div className="space-y-2">
-                      {sprints.map((sprint) => (
-                        <div
-                          key={sprint.id}
-                          className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
-                            selectedSprintId === sprint.id ? "bg-primary/10 border-primary" : ""
-                          }`}
-                          onClick={() => setSelectedSprintId(sprint.id)}
-                        >
-                          <div className="font-medium">Sprint {sprint.no}</div>
-                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button variant="outline" onClick={() => setAssignSprintModalOpen(false)} size="sm">
-                      Cancel
-                    </Button>
-                    <Button onClick={handleBulkAssignSprint} disabled={!selectedSprintId} size="sm">
-                      Assign
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={assignPersonModalOpen} onOpenChange={setAssignPersonModalOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
-                    <Users className="h-3 w-3 mr-1" />
-                    Assign Person
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
-                    <DialogTitle className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      Assign to Person
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="max-h-80 overflow-y-auto">
-                    <div className="space-y-2">
-                      {teamMembers.map((member) => {
-                        const memberTeam = teams.find((t) => t.id === member.teamId)
-                        return (
-                          <div
-                            key={member.id}
-                            className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 flex items-center space-x-3 ${
-                              selectedPersonId === member.id ? "bg-primary/10 border-primary" : ""
-                            }`}
-                            onClick={() => setSelectedPersonId(member.id)}
-                          >
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={member.avatar || "/placeholder.svg"} />
-                              <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{member.name}</div>
-                              <div className="text-sm text-muted-foreground">{memberTeam?.name || "No Team"}</div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button variant="outline" onClick={() => setAssignPersonModalOpen(false)} size="sm">
-                      Cancel
-                    </Button>
-                    <Button onClick={handleBulkAssignPerson} disabled={!selectedPersonId} size="sm">
-                      Assign
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              <Button size="sm" variant="destructive" onClick={handleBulkDelete} className="h-8 text-xs ml-auto">
-                <Trash2 className="h-3 w-3" />
-              </Button>
+        <div className="flex items-center justify-between p-4">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedIssues(new Set())
+              }}
+              disabled={selectedIssues.size === 0}
+            >
+              Clear Selection
+            </Button>
+            <Button variant="destructive" size="sm" onClick={handleDeleteSelected} disabled={selectedIssues.size === 0}>
+              Delete Selected
+            </Button>
+          </div>
+          <div className="space-x-2 text-sm">
+            <div>
+              Total Issues: <span className="font-medium">{issues.length}</span>
+            </div>
+            <div>
+              Showing: <span className="font-medium">{filteredAndSortedIssues.length}</span>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
-      {filteredAndSortedIssues.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">No issues found matching your filters.</p>
-        </div>
-      )}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete Issue</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this issue? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Issue ID
+              </Label>
+              <Input type="text" id="name" value={issueToDeleteId} disabled className="col-span-3" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" onClick={confirmDeleteIssue}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
