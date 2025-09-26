@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
@@ -72,6 +72,21 @@ export function EnhancedIssuesList({
   const [assignPersonModalOpen, setAssignPersonModalOpen] = useState(false)
   const [selectedSprintId, setSelectedSprintId] = useState<string>("")
   const [selectedPersonId, setSelectedPersonId] = useState<string>("")
+  const [isScrolling, setIsScrolling] = useState(false)
+  const scrollableRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const scrollableElement = scrollableRef.current
+    if (!scrollableElement) return
+
+    const handleScroll = () => {
+      const scrollLeft = scrollableElement.scrollLeft
+      setIsScrolling(scrollLeft > 0)
+    }
+
+    scrollableElement.addEventListener("scroll", handleScroll)
+    return () => scrollableElement.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const filteredAndSortedIssues = issues
     .filter((issue) => {
@@ -207,10 +222,10 @@ export function EnhancedIssuesList({
   }
 
   return (
-    <div className="space-y-4 py-4 px-4">
+    <div className="flex flex-col h-full w-full">
       {/* === STATISTICS OVERVIEW === */}
       {/* Summary cards showing key metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4 flex-shrink-0">
         <div className="text-center">
           <div className="text-2xl font-bold">{issues.length}</div>
           <div className="text-muted-foreground text-sm">Total Issues</div>
@@ -248,14 +263,16 @@ export function EnhancedIssuesList({
 
       {/* === ISSUES TABLE === */}
       {/* Main data table with integrated filters and sticky header */}
-      <div className="border rounded-lg flex flex-col h-full">
-        <div className="flex-1 overflow-hidden relative">
+      <div className="border rounded-lg flex flex-col flex-1 min-h-0 w-full">
+        <div className="flex-1 overflow-hidden relative min-h-0">
           {/* Sticky columns container */}
-          <div className="absolute left-0 top-0 z-20 bg-background border-r">
+          <div
+            className={`absolute left-0 top-0 z-20 bg-background ${isScrolling ? "border-r" : ""} transition-all duration-200`}
+          >
             <Table>
               <TableHeader className="sticky top-0 bg-background z-30 border-b">
                 <TableRow>
-                  <TableHead className="bg-background w-8 border-r-0">
+                  <TableHead className="w-12 bg-background">
                     <Checkbox
                       checked={
                         selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
@@ -264,9 +281,9 @@ export function EnhancedIssuesList({
                       aria-label="Select all issues"
                     />
                   </TableHead>
-                  <TableHead className="min-w-[200px] w-[200px] bg-background border-r-0">
+                  <TableHead className="min-w-[200px] max-w-[300px] w-[250px] bg-background">
                     <div className="flex items-center space-x-2">
-                      <div className="relative flex-1 min-w-[150px]">
+                      <div className="relative flex-1">
                         <Input
                           placeholder="Issue"
                           value={searchTerm}
@@ -283,16 +300,16 @@ export function EnhancedIssuesList({
               <TableBody>
                 {filteredAndSortedIssues.map((issue) => (
                   <TableRow key={issue.id}>
-                    <TableCell className="border-r-0">
+                    <TableCell>
                       <Checkbox
                         checked={selectedIssues.has(issue.id)}
                         onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
                         aria-label={`Select issue ${issue.title}`}
                       />
                     </TableCell>
-                    <TableCell className="border-r-0">
+                    <TableCell>
                       <div>
-                        <div className="font-medium">{issue.title}</div>
+                        <div className="font-medium truncate">{issue.title}</div>
                         <div className="text-sm text-muted-foreground">{issue.id}</div>
                         {issue.status === "Blocked" && (
                           <Badge className={getStatusColor("Blocked")} variant="outline">
@@ -308,17 +325,17 @@ export function EnhancedIssuesList({
           </div>
 
           {/* Scrollable columns container */}
-          <div className="overflow-x-auto ml-[252px]">
+          <div ref={scrollableRef} className="overflow-x-auto h-full" style={{ marginLeft: "calc(12px + 250px)" }}>
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10 border-b">
                 <TableRow>
-                  <TableHead className="min-w-[120px] bg-background">
+                  <TableHead className="min-w-[100px] bg-background">
                     <Select
                       value={priorityFilter}
                       onValueChange={(value: Priority | "all") => setPriorityFilter(value)}
                     >
                       <SelectTrigger
-                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium w-full"
                         aria-label="Filter by priority"
                       >
                         <div className="flex items-center">
@@ -335,10 +352,10 @@ export function EnhancedIssuesList({
                       </SelectContent>
                     </Select>
                   </TableHead>
-                  <TableHead className="min-w-[120px] bg-background">
+                  <TableHead className="min-w-[100px] bg-background">
                     <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
                       <SelectTrigger
-                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium w-full"
                         aria-label="Filter by status"
                       >
                         <div className="flex items-center">
@@ -355,13 +372,13 @@ export function EnhancedIssuesList({
                       </SelectContent>
                     </Select>
                   </TableHead>
-                  <TableHead className="min-w-[120px] bg-background">
+                  <TableHead className="min-w-[100px] bg-background">
                     <Select
                       value={businessImpactFilter}
                       onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
                     >
                       <SelectTrigger
-                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium w-full"
                         aria-label="Filter by business impact"
                       >
                         <div className="flex items-center">
@@ -380,7 +397,7 @@ export function EnhancedIssuesList({
                   <TableHead className="min-w-[120px] bg-background">
                     <Select value={teamFilter} onValueChange={setTeamFilter}>
                       <SelectTrigger
-                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                        className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium w-full"
                         aria-label="Filter by team"
                       >
                         <div className="flex items-center">
@@ -400,7 +417,7 @@ export function EnhancedIssuesList({
                   <TableHead className="min-w-[120px] bg-background">
                     <span className="text-xs font-medium text-foreground">Sprint</span>
                   </TableHead>
-                  <TableHead className="min-w-[120px] bg-background">
+                  <TableHead className="min-w-[100px] bg-background">
                     <span className="text-xs font-medium text-foreground">Created</span>
                   </TableHead>
                   <TableHead className="w-20 bg-background">
