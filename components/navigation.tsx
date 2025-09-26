@@ -89,7 +89,7 @@ export function Navigation({
     <TooltipProvider>
       <nav
         className={cn(
-          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out bg-sidebar border-sidebar-border border-r-0",
+          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out bg-muted border-sidebar-border border-r-0",
           isMobile ? (isExpanded ? "w-64 translate-x-0" : "w-64 -translate-x-full") : isExpanded ? "w-64" : "w-16",
         )}
       >
