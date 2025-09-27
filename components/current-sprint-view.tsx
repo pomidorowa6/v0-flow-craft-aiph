@@ -53,29 +53,7 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold">{sprintIssues.length}</div>
-          <div className="text-muted-foreground text-sm">Total Issues</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-600">{sprintIssues.filter((i) => i.status === "Todo").length}</div>
-          <div className="text-muted-foreground text-sm">To do</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">{inProgressIssues.length}</div>
-          <div className="text-muted-foreground text-sm">In Progress</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-yellow-600">{inReviewIssues.length}</div>
-          <div className="text-muted-foreground text-sm">In Review</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">{completedIssues.length}</div>
-          <div className="text-muted-foreground text-sm">Completed</div>
-        </div>
-      </div>
-
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -144,6 +122,31 @@ export function CurrentSprintView({ sprint, issues, onUpdateIssueStatus }: Curre
           )}
         </CardContent>
       </Card>
+      <div className="h-full flex flex-col space-y-2">
+        <h2 className="text-xl font-semibold">Kanban Board</h2>
+        <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold">{sprintIssues.length}</div>
+            <div className="text-muted-foreground text-sm">Total Issues</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-gray-600">{sprintIssues.filter((i) => i.status === "Todo").length}</div>
+            <div className="text-muted-foreground text-sm">To do</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{inProgressIssues.length}</div>
+            <div className="text-muted-foreground text-sm">In Progress</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-yellow-600">{inReviewIssues.length}</div>
+            <div className="text-muted-foreground text-sm">In Review</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">{completedIssues.length}</div>
+            <div className="text-muted-foreground text-sm">Completed</div>
+          </div>
+        </div>
+      </div>
 
       <KanbanBoard sprint={sprint} issues={issues} onUpdateIssueStatus={onUpdateIssueStatus} />
     </div>

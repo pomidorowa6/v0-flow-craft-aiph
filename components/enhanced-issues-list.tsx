@@ -73,7 +73,6 @@ export function EnhancedIssuesList({
   const [selectedSprintId, setSelectedSprintId] = useState<string>("")
   const [selectedPersonId, setSelectedPersonId] = useState<string>("")
   const [isScrolled, setIsScrolled] = useState(false)
-  const [hoveredRow, setHoveredRow] = useState<string | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -89,10 +88,6 @@ export function EnhancedIssuesList({
       return () => container.removeEventListener("scroll", handleScroll)
     }
   }, [])
-
-  const getRowStyle = (issueId: string) => {
-    return hoveredRow === issueId ? { backgroundColor: "hsl(var(--muted) / 0.5)" } : {}
-  }
 
   const filteredAndSortedIssues = issues
     .filter((issue) => {
@@ -269,22 +264,24 @@ export function EnhancedIssuesList({
 
       {/* === ISSUES TABLE === */}
       {/* Main data table with integrated filters and sticky header */}
-      <div className="flex-1 min-h-0 border border-border rounded-lg flex-1 overflow-auto">
-        <div ref={scrollContainerRef} className="flex-1 overflow-auto">
+      <div className="flex-1 min-h-0 border border-border rounded-lg relative overflow-hidden">
+        <div ref={scrollContainerRef} className="h-full overflow-auto">
           <Table>
             <TableHeader
-              className="sticky top-0 z-30 bg-background"
+              className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm"
               style={{
                 borderBottom: "1px solid hsl(var(--border))",
+                position: "sticky",
+                top: 0,
               }}
             >
-              <TableRow className="bg-background">
+              <TableRow className="bg-background/95 backdrop-blur-sm">
                 <TableHead
-                  className="w-12 bg-background px-4 py-0"
+                  className="w-12 bg-background/95 backdrop-blur-sm px-4 py-0"
                   style={{
                     position: "sticky",
                     left: 0,
-                    zIndex: 31,
+                    zIndex: 60,
                     width: "48px",
                     minWidth: "48px",
                     maxWidth: "48px",
@@ -300,11 +297,11 @@ export function EnhancedIssuesList({
                 </TableHead>
 
                 <TableHead
-                  className="min-w-[200px] bg-background px-4 py-0"
+                  className="min-w-[200px] bg-background/95 backdrop-blur-sm px-4 py-0"
                   style={{
                     position: "sticky",
                     left: "48px",
-                    zIndex: 31,
+                    zIndex: 60,
                     width: "300px",
                     minWidth: "300px",
                     maxWidth: "300px",
@@ -325,7 +322,7 @@ export function EnhancedIssuesList({
                   </div>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-0">
+                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
                   <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
                     <SelectTrigger
                       className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
@@ -346,7 +343,7 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-0">
+                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
                   <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
                     <SelectTrigger
                       className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
@@ -367,7 +364,7 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-0">
+                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
                   <Select
                     value={businessImpactFilter}
                     onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
@@ -390,7 +387,7 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-0">
+                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
                   <Select value={teamFilter} onValueChange={setTeamFilter}>
                     <SelectTrigger
                       className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
@@ -411,15 +408,15 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="bg-background px-4 py-0">
+                <TableHead className="bg-background/95 backdrop-blur-sm px-4 py-0">
                   <span className="text-xs font-medium text-foreground">Sprint</span>
                 </TableHead>
 
-                <TableHead className="bg-background px-4 py-0">
+                <TableHead className="bg-background/95 backdrop-blur-sm px-4 py-0">
                   <span className="text-xs font-medium text-foreground">Created</span>
                 </TableHead>
 
-                <TableHead className="w-20 bg-background px-4 py-0">
+                <TableHead className="w-20 bg-background/95 backdrop-blur-sm px-4 py-0">
                   <span className="text-xs font-medium text-foreground">Actions</span>
                 </TableHead>
               </TableRow>
@@ -432,22 +429,16 @@ export function EnhancedIssuesList({
                 const sprint = sprints.find((s) => s.id === issue.sprintId)
 
                 return (
-                  <TableRow
-                    key={issue.id}
-                    className="border-b border-border"
-                    onMouseEnter={() => setHoveredRow(issue.id)}
-                    onMouseLeave={() => setHoveredRow(null)}
-                  >
+                  <TableRow key={issue.id} className="border-b border-border bg-background">
                     <TableCell
-                      className="px-4 py-3 bg-background transition-colors"
+                      className="px-4 py-3 bg-background"
                       style={{
                         position: "sticky",
                         left: 0,
-                        zIndex: 10,
+                        zIndex: 30,
                         width: "48px",
                         minWidth: "48px",
                         maxWidth: "48px",
-                        ...getRowStyle(issue.id),
                       }}
                     >
                       <Checkbox
@@ -458,16 +449,15 @@ export function EnhancedIssuesList({
                     </TableCell>
 
                     <TableCell
-                      className="px-4 py-3 bg-background transition-colors"
+                      className="px-4 py-3 bg-background"
                       style={{
                         position: "sticky",
                         left: "48px",
-                        zIndex: 10,
+                        zIndex: 30,
                         width: "300px",
                         minWidth: "300px",
                         maxWidth: "300px",
                         boxShadow: isScrolled ? "2px 0 0 0 hsl(var(--border))" : "none",
-                        ...getRowStyle(issue.id),
                       }}
                     >
                       <div>
@@ -481,32 +471,32 @@ export function EnhancedIssuesList({
                       </div>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       <Badge className={getPriorityColor(issue.priority)} variant="outline">
                         {issue.priority}
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       <Badge className={getStatusColor(issue.status)} variant="outline">
                         {issue.status}
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       <Badge className={getImpactColor(issue.businessImpact)} variant="outline">
                         {issue.businessImpact}
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       <div>
                         <div className="font-medium">{team?.name || "Unassigned"}</div>
                         <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
                       </div>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       {sprint ? (
                         <div>
                           <div className="font-medium">Sprint {sprint.no}</div>
@@ -517,11 +507,11 @@ export function EnhancedIssuesList({
                       )}
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       {new Date(issue.createdAt).toLocaleDateString()}
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 transition-colors" style={getRowStyle(issue.id)}>
+                    <TableCell className="px-4 py-3 bg-background">
                       <div className="flex space-x-1">
                         <EnhancedIssueForm
                           issue={issue}
@@ -578,7 +568,7 @@ export function EnhancedIssuesList({
 
         {/* BULK OPERATIONS BAR */}
         {selectedIssues.size > 0 && (
-          <div className="flex items-center justify-between px-4 py-2 border-t bg-primary/10 dark:bg-primary/20 flex-shrink-0">
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-2 border-t bg-background/95 backdrop-blur-sm z-30">
             <span className="text-sm font-medium text-foreground">
               {selectedIssues.size} issue{selectedIssues.size !== 1 ? "s" : ""} selected
             </span>
