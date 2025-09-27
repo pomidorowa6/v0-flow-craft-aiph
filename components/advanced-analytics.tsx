@@ -92,38 +92,7 @@ export default function AdvancedAnalytics() {
   return (
     <div className="space-y-6">
       {/* Header with filters */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Advanced Analytics</h2>
-          <p className="text-muted-foreground">Deep insights into team performance and project health</p>
-        </div>
-        <div className="flex gap-4">
-          <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select team" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Teams</SelectItem>
-              {initialTeams.map((team) => (
-                <SelectItem key={team.id} value={team.id}>
-                  {team.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Time range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1month">1 Month</SelectItem>
-              <SelectItem value="3months">3 Months</SelectItem>
-              <SelectItem value="6months">6 Months</SelectItem>
-              <SelectItem value="1year">1 Year</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
@@ -186,50 +155,92 @@ export default function AdvancedAnalytics() {
           {/* Team Performance Overview */}
           <Card>
             <CardHeader>
-              <CardTitle>Team Performance Overview</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Team Performance Overview</CardTitle>
+                <div className="flex gap-4">
+                  <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Select team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Teams</SelectItem>
+                      {initialTeams.map((team) => (
+                        <SelectItem key={team.id} value={team.id}>
+                          {team.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={timeRange} onValueChange={setTimeRange}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Time range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1month">1 Month</SelectItem>
+                      <SelectItem value="3months">3 Months</SelectItem>
+                      <SelectItem value="6months">6 Months</SelectItem>
+                      <SelectItem value="1year">1 Year</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {filteredMetrics.map((team) => (
-                  <div key={team.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <h4 className="font-medium">{team.name}</h4>
-                        <p className="text-sm text-muted-foreground">{team.memberIds.length} members</p>
-                      </div>
-                      <Badge
-                        variant={
-                          team.health === "healthy"
-                            ? "default"
-                            : team.health === "at_risk"
-                              ? "secondary"
-                              : "destructive"
-                        }
-                      >
-                        {team.health}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-center">
-                        <div className="text-sm font-medium">{team.completionRate.toFixed(1)}%</div>
-                        <div className="text-xs text-muted-foreground">Completion</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-medium">{team.blockedIssues}</div>
-                        <div className="text-xs text-muted-foreground">Blocked</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm font-medium">{team.highImpactIssues}</div>
-                        <div className="text-xs text-muted-foreground">High Impact</div>
-                      </div>
-                      {team.velocityTrend === "up" ? (
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-red-600" />
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium">Team</th>
+                      <th className="text-left py-3 px-4 font-medium">Members</th>
+                      <th className="text-left py-3 px-4 font-medium">Health</th>
+                      <th className="text-right py-3 px-4 font-medium">Completion</th>
+                      <th className="text-right py-3 px-4 font-medium">Blocked</th>
+                      <th className="text-right py-3 px-4 font-medium">High Impact</th>
+                      <th className="text-center py-3 px-4 font-medium">Trend</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredMetrics.map((team) => (
+                      <tr key={team.id} className="border-b hover:bg-muted/50">
+                        <td className="py-4 px-4">
+                          <div className="font-medium">{team.name}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-sm text-muted-foreground">{team.memberIds.length}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge
+                            variant={
+                              team.health === "healthy"
+                                ? "default"
+                                : team.health === "at_risk"
+                                  ? "secondary"
+                                  : "destructive"
+                            }
+                          >
+                            {team.health}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-medium">{team.completionRate.toFixed(1)}%</div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-medium">{team.blockedIssues}</div>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <div className="font-medium">{team.highImpactIssues}</div>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {team.velocityTrend === "up" ? (
+                            <TrendingUp className="h-4 w-4 text-green-600 mx-auto" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4 text-red-600 mx-auto" />
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -383,7 +394,7 @@ export default function AdvancedAnalytics() {
 
         {/* Team Health Tab */}
         <TabsContent value="health" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredMetrics.map((team) => (
               <Card key={team.id}>
                 <CardHeader>

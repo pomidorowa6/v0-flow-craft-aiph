@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { X, Plus, Tag, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { EnhancedIssue, Priority, BusinessImpact, Sprint, TeamMember, Team } from "@/types"
+import type { EnhancedIssue, Priority, BusinessImpact, Sprint, TeamMember, Team, IssueStatus } from "@/types"
 
 interface EnhancedIssueFormProps {
   issue?: EnhancedIssue
@@ -136,7 +136,7 @@ export function EnhancedIssueForm({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div>
             <Label htmlFor="priority">Priority</Label>
             <Select
@@ -152,6 +152,25 @@ export function EnhancedIssueForm({
                 <SelectItem value="P2">P2 - Medium</SelectItem>
                 <SelectItem value="P3">P3 - Low</SelectItem>
                 <SelectItem value="P4">P4 - Lowest</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="status">Status</Label>
+            <Select
+              value={formData.status}
+              onValueChange={(value: IssueStatus) => setFormData((prev) => ({ ...prev, status: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Todo">Todo</SelectItem>
+                <SelectItem value="In Progress">In Progress</SelectItem>
+                <SelectItem value="In Review">In Review</SelectItem>
+                <SelectItem value="Done">Done</SelectItem>
+                <SelectItem value="Blocked">Blocked</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -421,7 +440,14 @@ export function EnhancedIssueForm({
 
       {/* Actions */}
       <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            onCancel()
+            setIsOpen(false)
+          }}
+        >
           Cancel
         </Button>
         <Button type="submit">{issue ? "Update Issue" : "Create Issue"}</Button>

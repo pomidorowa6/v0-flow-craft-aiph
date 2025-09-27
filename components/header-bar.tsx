@@ -1,18 +1,25 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { SidebarOpenIcon, SidebarCloseIcon } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import type { ViewType } from "@/types"
+import { NotificationBell } from "@/components/notification-bell"
+import type { ViewType, Notification } from "@/types"
 
 interface HeaderBarProps {
   currentView: ViewType
   isExpanded: boolean
   onToggleExpanded: () => void
+  notifications: Notification[]
+  onMarkAsRead: (notificationId: string) => void
+  onMarkAsUnread: (notificationId: string) => void
+  onDismiss: (notificationId: string) => void
+  onMarkAllAsRead: () => void
 }
 
 const viewLabels: Record<ViewType, string> = {
-  issues: "Issues",
+  issues: "Backlog",
   "current-sprint": "Current Sprint",
   sprints: "Sprints",
   management: "Management Dashboard",
@@ -21,17 +28,36 @@ const viewLabels: Record<ViewType, string> = {
   analytics: "Analytics",
 }
 
-export function HeaderBar({ currentView, isExpanded, onToggleExpanded }: HeaderBarProps) {
+export function HeaderBar({
+  currentView,
+  isExpanded,
+  onToggleExpanded,
+  notifications,
+  onMarkAsRead,
+  onMarkAsUnread,
+  onDismiss,
+  onMarkAllAsRead,
+}: HeaderBarProps) {
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-6">
-      <div className="flex items-center space-x-4">
+    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 flex items-center justify-between w-auto px-2 h-10">
+      <div className="flex items-center space-x-2">
         <Button variant="ghost" size="sm" onClick={onToggleExpanded} className="p-2">
-          {isExpanded ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {isExpanded ? <SidebarCloseIcon className="h-4 w-4" /> : <SidebarOpenIcon className="h-4 w-4" />}
         </Button>
-        <h2 className="text-2xl font-bold text-foreground">{viewLabels[currentView]}</h2>
+
+        <Separator orientation="vertical" className="h-6" />
+
+        <h2 className="text-lg font-semibold text-foreground">{viewLabels[currentView]}</h2>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center px-0 space-x-6">
+        <NotificationBell
+          notifications={notifications}
+          onMarkAsRead={onMarkAsRead}
+          onMarkAsUnread={onMarkAsUnread}
+          onDismiss={onDismiss}
+          onMarkAllAsRead={onMarkAllAsRead}
+        />
         <ThemeToggle />
       </div>
     </header>

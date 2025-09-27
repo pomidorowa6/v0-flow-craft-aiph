@@ -11,6 +11,7 @@ import { PeopleCapacityView } from "@/components/people-capacity-view"
 import { DependenciesView } from "@/components/dependencies-view"
 import AdvancedAnalytics from "@/components/advanced-analytics"
 import { useNotifications } from "@/hooks/use-notifications"
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
   initialIssues,
   initialSprints,
@@ -30,6 +31,7 @@ export default function TaskFlowApp() {
   const [teamMembers] = useState<TeamMember[]>(initialTeamMembers)
   const [enhancedIssues, setEnhancedIssues] = useState<EnhancedIssue[]>(enhancedInitialIssues)
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)
+  const isMobile = useIsMobile()
 
   const { notifications, markAsRead, markAsUnread, dismiss, markAllAsRead } = useNotifications({
     issues: enhancedIssues,
@@ -264,7 +266,14 @@ export default function TaskFlowApp() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
+      {isMobile && isSidebarExpanded && (
+        <div
+          className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm"
+          onClick={() => setIsSidebarExpanded(false)}
+        />
+      )}
+
       <Navigation
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -277,16 +286,28 @@ export default function TaskFlowApp() {
         onMarkAllAsRead={markAllAsRead}
         isExpanded={isSidebarExpanded}
         onToggleExpanded={() => setIsSidebarExpanded(!isSidebarExpanded)}
+        isMobile={isMobile}
       />
-      <div className={`transition-all duration-300 ${isSidebarExpanded ? "ml-60" : "ml-16"}`}>
-        <HeaderBar
-          currentView={currentView}
-          isExpanded={isSidebarExpanded}
-          onToggleExpanded={() => setIsSidebarExpanded(!isSidebarExpanded)}
-        />
-        <div className="p-6">
-          <main className="bg-card rounded-xl shadow-lg border border-border p-6 min-h-[calc(100vh-8rem)]">
-            {renderCurrentView()}
+
+      <div className={`transition-all duration-300 ${!isMobile && (isSidebarExpanded ? "ml-64" : "ml-16")}`}>
+        <div
+          className={`${isMobile ? "p-0" : "p-4"} min-h-screen bg-muted ${isMobile ? "pl-0 pt-0 pb-0 pr-0" : "pl-0 pt-4 pb-4 pr-4"} mx-0`}
+        >
+          <main
+            className={`bg-background ${isMobile ? "min-h-screen" : "rounded-xl shadow-lg border-border h-[calc(100vh-2rem)]"} flex flex-col overflow-hidden ${isMobile ? "border-0" : "border-0 border-none"}`}
+          >
+            <HeaderBar
+              currentView={currentView}
+              isExpanded={isSidebarExpanded}
+              onToggleExpanded={() => setIsSidebarExpanded(!isSidebarExpanded)}
+              notifications={notifications}
+              onMarkAsRead={markAsRead}
+              onMarkAsUnread={markAsUnread}
+              onDismiss={dismiss}
+              onMarkAllAsRead={markAllAsRead}
+            />
+
+            <div className="flex-1 overflow-auto p-6 px-4 py-4">{renderCurrentView()}</div>
           </main>
         </div>
       </div>

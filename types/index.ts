@@ -1,5 +1,5 @@
 export type Priority = "P0" | "P1" | "P2" | "P3" | "P4" | "P5"
-export type IssueStatus = "Todo" | "In Progress" | "In Review" | "Done"
+export type IssueStatus = "Todo" | "In Progress" | "In Review" | "Done" | "Blocked"
 export type SprintStatus = "Planned" | "Active" | "Completed"
 
 export interface Issue {
@@ -16,7 +16,9 @@ export interface Issue {
 
 export interface Sprint {
   id: string
-  name: string
+  no: string | number
+  title: string
+  name: string // keeping for backward compatibility
   status: SprintStatus
   startDate: Date
   endDate: Date

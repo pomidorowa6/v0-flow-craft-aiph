@@ -43,6 +43,8 @@ export const generateTaskId = (existingIssues: Issue[]): string => {
 export const initialSprints: Sprint[] = [
   {
     id: "sprint-1",
+    no: "1",
+    title: "Foundation",
     name: "Sprint 1 - Foundation",
     status: "Completed",
     startDate: new Date("2024-01-01"),
@@ -52,6 +54,8 @@ export const initialSprints: Sprint[] = [
   },
   {
     id: "sprint-2",
+    no: "2",
+    title: "Core Features",
     name: "Sprint 2 - Core Features",
     status: "Active",
     startDate: new Date("2024-01-15"),
@@ -61,6 +65,8 @@ export const initialSprints: Sprint[] = [
   },
   {
     id: "sprint-3",
+    no: "3",
+    title: "Polish & Testing",
     name: "Sprint 3 - Polish & Testing",
     status: "Planned",
     startDate: new Date("2024-01-29"),

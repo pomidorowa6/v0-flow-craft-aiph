@@ -95,7 +95,7 @@ export function IssueCard({ issue, sprints, onEdit, onDelete, onAssignToSprint, 
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => onDelete(issue.id)} className="bg-red-500 hover:bg-red-600">
+                      <AlertDialogAction onClick={() => onDelete(issue.id)} variant="outline">
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>

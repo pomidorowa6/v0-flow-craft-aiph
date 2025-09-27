@@ -79,11 +79,7 @@ export function EnhancedIssueCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {onEdit && <DropdownMenuItem onClick={() => onEdit(issue)}>Edit Issue</DropdownMenuItem>}
-              {onDelete && (
-                <DropdownMenuItem onClick={() => onDelete(issue.id)} className="text-red-600">
-                  Delete Issue
-                </DropdownMenuItem>
-              )}
+              {onDelete && <DropdownMenuItem onClick={() => onDelete(issue.id)}>Delete Issue</DropdownMenuItem>}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

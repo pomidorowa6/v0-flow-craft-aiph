@@ -1,12 +1,11 @@
 "use client"
-
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { List, Kanban, Calendar, BarChart3, Users, GitBranch, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { NotificationBell } from "@/components/notification-bell"
 import type { ViewType, Issue, Sprint, Notification } from "@/types"
+import Image from "next/image"
 
 interface NavigationProps {
   currentView: ViewType
@@ -20,6 +19,7 @@ interface NavigationProps {
   onMarkAllAsRead: () => void
   isExpanded: boolean
   onToggleExpanded: () => void
+  isMobile?: boolean
 }
 
 export function Navigation({
@@ -34,15 +34,15 @@ export function Navigation({
   onMarkAllAsRead,
   isExpanded,
   onToggleExpanded,
+  isMobile = false,
 }: NavigationProps) {
-  const [isHovered, setIsHovered] = useState(false)
   const activeSprint = sprints.find((sprint) => sprint.status === "Active")
   const activeSprintIssues = issues.filter((issue) => issue.sprintId === activeSprint?.id)
 
   const navItems = [
     {
       id: "issues" as ViewType,
-      label: "Issues",
+      label: "Backlog",
       icon: List,
       count: issues.length,
     },
@@ -85,91 +85,110 @@ export function Navigation({
     },
   ]
 
-  const shouldShowExpanded = isExpanded || isHovered
-
   return (
-    <>
-      {shouldShowExpanded && <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={onToggleExpanded} />}
-
+    <TooltipProvider>
       <nav
         className={cn(
-          "fixed left-0 top-0 h-full bg-background border-r border-border z-50 transition-all duration-300 ease-in-out",
-          shouldShowExpanded ? "w-60" : "w-16",
+          "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out bg-muted border-sidebar-border border-r-0",
+          isMobile ? (isExpanded ? "w-64 translate-x-0" : "w-64 -translate-x-full") : isExpanded ? "w-64" : "w-16",
         )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center h-16 px-4 border-b border-border">
+          <div
+            className={cn(
+              "flex items-center h-[72px] px-4 text-left justify-start mx-0",
+              isMobile || isExpanded ? "w-full" : "w-16",
+            )}
+          >
             <div className="flex items-center space-x-3">
-              <img src="/flowcraft-logo.png" alt="FlowCraft Logo" className="w-8 h-8 flex-shrink-0" />
-              {shouldShowExpanded && <h1 className="text-lg font-semibold whitespace-nowrap">FlowCraft</h1>}
+              <div className="flex items-center justify-center flex-shrink-0 w-8 h-8">
+                <Image src="/images/flowcraft-logo.png" alt="FlowCraft" width={32} height={32} className="rounded-lg" />
+              </div>
+              {(isMobile || isExpanded) && (
+                <h1 className="text-lg font-semibold whitespace-nowrap text-sidebar-foreground">FlowCraft</h1>
+              )}
             </div>
           </div>
 
           <div className="flex-1 py-4">
-            <div className="space-y-1 px-2">
+            <div className="space-y-2 text-left px-3">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = currentView === item.id
                 const isDisabled = item.disabled
 
-                return (
+                const buttonContent = (
                   <Button
                     key={item.id}
-                    variant={isActive ? "secondary" : "ghost"}
+                    variant="ghost"
                     size="sm"
-                    onClick={() => !isDisabled && onViewChange(item.id)}
+                    onClick={() => {
+                      if (!isDisabled) {
+                        onViewChange(item.id)
+                        if (isMobile) {
+                          onToggleExpanded()
+                        }
+                      }
+                    }}
                     disabled={isDisabled}
                     className={cn(
-                      "w-full justify-start h-10 px-3",
-                      isActive && "bg-secondary text-secondary-foreground",
+                      "w-full justify-start h-10 px-3 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
+                      isActive && "bg-sidebar-accent text-sidebar-foreground",
                       isDisabled && "opacity-50 cursor-not-allowed",
-                      !shouldShowExpanded && "px-3 justify-center",
+                      !isMobile && !isExpanded && "px-3 justify-center",
                     )}
                   >
                     <Icon className="h-4 w-4 flex-shrink-0" />
-                    {shouldShowExpanded && (
+                    {(isMobile || isExpanded) && (
                       <>
                         <span className="ml-3 truncate">{item.label}</span>
-                        <Badge variant="outline" className="ml-auto text-xs">
+                        <Badge variant="secondary" className="ml-auto text-xs">
                           {item.count}
                         </Badge>
                       </>
                     )}
                   </Button>
                 )
+
+                if (!isMobile && !isExpanded) {
+                  return (
+                    <Tooltip key={item.id}>
+                      <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
+                      <TooltipContent side="right" className="flex items-center gap-2">
+                        <span>{item.label}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {item.count}
+                        </Badge>
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                }
+
+                return buttonContent
               })}
             </div>
           </div>
 
-          <div className="border-t border-border p-2">
-            <div className="flex flex-col space-y-2">
-              <div className={cn("flex", shouldShowExpanded ? "justify-start" : "justify-center")}>
-                <NotificationBell
-                  notifications={notifications}
-                  onMarkAsRead={onMarkAsRead}
-                  onMarkAsUnread={onMarkAsUnread}
-                  onDismiss={onDismiss}
-                  onMarkAllAsRead={onMarkAllAsRead}
-                />
+          <div className="p-4 text-left px-4 py-4">
+            <div
+              className={cn(
+                "flex space-x-3 p-2 rounded-lg hover:bg-sidebar-accent/50 cursor-pointer py-0 px-0 text-left items-center",
+                !isMobile && !isExpanded && "justify-center",
+              )}
+            >
+              <div className="w-8 bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground text-sm font-medium flex-shrink-0 text-left rounded-md h-8">
+                JD
               </div>
-
-              <div
-                className={cn(
-                  "flex items-center space-x-3 p-2 rounded-lg hover:bg-accent cursor-pointer",
-                  !shouldShowExpanded && "justify-center",
-                )}
-              >
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium flex-shrink-0">
-                  U
+              {(isMobile || isExpanded) && (
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-medium truncate text-sidebar-foreground">John Doe</span>
+                  <span className="text-xs text-sidebar-foreground/70 truncate">john.doe@xyz.com</span>
                 </div>
-                {shouldShowExpanded && <span className="text-sm font-medium truncate">User</span>}
-              </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
-    </>
+    </TooltipProvider>
   )
 }

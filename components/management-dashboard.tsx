@@ -81,7 +81,63 @@ export function ManagementDashboard({ teams, teamMembers, issues, sprints }: Man
           </Badge>
         </div>
       </div>
+ {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-blue-500" />
+              <div>
+                <div className="text-2xl font-bold">{teams.length}</div>
+                <div className="text-xs text-muted-foreground">Active Teams</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              <div>
+                <div className="text-2xl font-bold">{teams.filter((t) => t.healthStatus === "healthy").length}</div>
+                <div className="text-xs text-muted-foreground">Healthy Teams</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <div>
+                <div className="text-2xl font-bold">{issues.filter((issue) => issue.blockedReason).length}</div>
+                <div className="text-xs text-muted-foreground">Blocked Issues</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4 text-yellow-500" />
+              <div>
+                <div className="text-2xl font-bold">
+                  {Math.round(
+                    (teamMembers.reduce((sum, member) => sum + member.currentWorkload / member.capacity, 0) /
+                      teamMembers.length) *
+                      100,
+                  )}
+                  %
+                </div>
+                <div className="text-xs text-muted-foreground">Avg Capacity</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       {/* Team Status Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {teams.map((team) => {
@@ -188,63 +244,7 @@ export function ManagementDashboard({ teams, teamMembers, issues, sprints }: Man
         })}
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-blue-500" />
-              <div>
-                <div className="text-2xl font-bold">{teams.length}</div>
-                <div className="text-xs text-muted-foreground">Active Teams</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <div>
-                <div className="text-2xl font-bold">{teams.filter((t) => t.healthStatus === "healthy").length}</div>
-                <div className="text-xs text-muted-foreground">Healthy Teams</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-              <div>
-                <div className="text-2xl font-bold">{issues.filter((issue) => issue.blockedReason).length}</div>
-                <div className="text-xs text-muted-foreground">Blocked Issues</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4 text-yellow-500" />
-              <div>
-                <div className="text-2xl font-bold">
-                  {Math.round(
-                    (teamMembers.reduce((sum, member) => sum + member.currentWorkload / member.capacity, 0) /
-                      teamMembers.length) *
-                      100,
-                  )}
-                  %
-                </div>
-                <div className="text-xs text-muted-foreground">Avg Capacity</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+     
     </div>
   )
 }
