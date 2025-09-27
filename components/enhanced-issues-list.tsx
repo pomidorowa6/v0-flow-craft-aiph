@@ -280,7 +280,7 @@ export function EnhancedIssuesList({
             >
               <TableRow className="bg-background">
                 <TableHead
-                  className="w-12 bg-background px-4 py-3"
+                  className="w-12 bg-background px-4 py-0"
                   style={{
                     position: "sticky",
                     left: 0,
@@ -300,7 +300,7 @@ export function EnhancedIssuesList({
                 </TableHead>
 
                 <TableHead
-                  className="min-w-[200px] bg-background px-4 py-3"
+                  className="min-w-[200px] bg-background px-4 py-0"
                   style={{
                     position: "sticky",
                     left: "48px",
@@ -325,7 +325,7 @@ export function EnhancedIssuesList({
                   </div>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-3">
+                <TableHead className="min-w-[120px] bg-background px-4 py-0">
                   <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
                     <SelectTrigger
                       className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
@@ -346,7 +346,7 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-3">
+                <TableHead className="min-w-[120px] bg-background px-4 py-0">
                   <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
                     <SelectTrigger
                       className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
@@ -367,7 +367,7 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-3">
+                <TableHead className="min-w-[120px] bg-background px-4 py-0">
                   <Select
                     value={businessImpactFilter}
                     onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
@@ -390,7 +390,7 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background px-4 py-3">
+                <TableHead className="min-w-[120px] bg-background px-4 py-0">
                   <Select value={teamFilter} onValueChange={setTeamFilter}>
                     <SelectTrigger
                       className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
@@ -411,15 +411,15 @@ export function EnhancedIssuesList({
                   </Select>
                 </TableHead>
 
-                <TableHead className="bg-background px-4 py-3">
+                <TableHead className="bg-background px-4 py-0">
                   <span className="text-xs font-medium text-foreground">Sprint</span>
                 </TableHead>
 
-                <TableHead className="bg-background px-4 py-3">
+                <TableHead className="bg-background px-4 py-0">
                   <span className="text-xs font-medium text-foreground">Created</span>
                 </TableHead>
 
-                <TableHead className="w-20 bg-background px-4 py-3">
+                <TableHead className="w-20 bg-background px-4 py-0">
                   <span className="text-xs font-medium text-foreground">Actions</span>
                 </TableHead>
               </TableRow>
