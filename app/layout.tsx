@@ -14,19 +14,19 @@ import {
 } from "next/font/google"
 
 const robotoSlab = V0_Font_Roboto_Slab({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["100", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
   variable: "--font-roboto-slab",
 })
 
 const robotoMono = V0_Font_Roboto_Mono({
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  weight: ["100", "300", "400", "500", "700"],
   subsets: ["latin"],
   variable: "--font-roboto-mono",
 })
 
 const roboto = V0_Font_Roboto({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["100", "300", "400", "500", "700", "900"],
   subsets: ["latin"],
   variable: "--font-roboto",
 })
