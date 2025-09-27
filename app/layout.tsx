@@ -7,12 +7,29 @@ import { Suspense } from "react"
 import { ThemeProvider } from "@/contexts/theme-context"
 import "./globals.css"
 
-import { Roboto_Slab as V0_Font_Roboto_Slab, Roboto_Mono as V0_Font_Roboto_Mono, Roboto as V0_Font_Roboto } from 'next/font/google'
+import {
+  Roboto_Slab as V0_Font_Roboto_Slab,
+  Roboto_Mono as V0_Font_Roboto_Mono,
+  Roboto as V0_Font_Roboto,
+} from "next/font/google"
 
-// Initialize fonts
-V0_Font_Roboto_Slab({ weight: ["100","200","300","400","500","600","700","800","900"] })
-V0_Font_Roboto_Mono({ weight: ["100","200","300","400","500","600","700"] })
-V0_Font_Roboto({ weight: ["100","200","300","400","500","600","700","800","900"] })
+const robotoSlab = V0_Font_Roboto_Slab({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-roboto-slab",
+})
+
+const robotoMono = V0_Font_Roboto_Mono({
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-roboto-mono",
+})
+
+const roboto = V0_Font_Roboto({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-roboto",
+})
 
 export const metadata: Metadata = {
   title: "TaskFlow - Linear-style Task Management",
@@ -27,7 +44,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body
+        className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${roboto.variable} ${robotoMono.variable} ${robotoSlab.variable}`}
+      >
         <ThemeProvider>
           <Suspense fallback={null}>{children}</Suspense>
         </ThemeProvider>
