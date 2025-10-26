@@ -4,11 +4,22 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GitBranch, AlertTriangle, Clock, ArrowRight, Target, CheckCircle, XCircle, Circle } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  GitBranch,
+  AlertTriangle,
+  Clock,
+  ArrowRight,
+  Target,
+  CheckCircle,
+  XCircle,
+  Circle,
+  TrendingUp,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { EnhancedIssue, Team, TeamMember, Sprint } from "@/types"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
 interface DependenciesViewProps {
   issues: EnhancedIssue[]
@@ -37,9 +48,26 @@ interface CrossTeamDependency {
   riskLevel: "low" | "medium" | "high"
 }
 
+interface RiskTimelineData {
+  month: string
+  critical: number
+  high: number
+  medium: number
+  low: number
+  criticalTasks: EnhancedIssue[]
+  highTasks: EnhancedIssue[]
+  mediumTasks: EnhancedIssue[]
+  lowTasks: EnhancedIssue[]
+}
+
 export function DependenciesView({ issues, teams, teamMembers, sprints }: DependenciesViewProps) {
   const [selectedTeam, setSelectedTeam] = useState<string>("all")
   const [selectedSprint, setSelectedSprint] = useState<string>("all")
+  const [selectedRiskData, setSelectedRiskData] = useState<{
+    month: string
+    riskLevel: string
+    tasks: EnhancedIssue[]
+  } | null>(null)
 
   // Find cross-team dependencies
   const getCrossTeamDependencies = (): CrossTeamDependency[] => {
@@ -141,8 +169,42 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
     return chains
   }
 
+  const getRiskTimelineData = (): RiskTimelineData[] => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+    const timelineData: RiskTimelineData[] = []
+
+    months.forEach((month, index) => {
+      // Simulate risk distribution over time based on issue data
+      const monthIssues = issues.filter((issue) => {
+        // Simple simulation: distribute issues across months
+        const issueMonth = new Date(issue.createdAt || Date.now()).getMonth()
+        return issueMonth === index
+      })
+
+      const criticalTasks = monthIssues.filter((i) => i.businessImpact === "Critical" || i.blockedReason)
+      const highTasks = monthIssues.filter((i) => i.businessImpact === "High" && !i.blockedReason)
+      const mediumTasks = monthIssues.filter((i) => i.businessImpact === "Medium")
+      const lowTasks = monthIssues.filter((i) => i.businessImpact === "Low")
+
+      timelineData.push({
+        month,
+        critical: criticalTasks.length,
+        high: highTasks.length,
+        medium: mediumTasks.length,
+        low: lowTasks.length,
+        criticalTasks,
+        highTasks,
+        mediumTasks,
+        lowTasks,
+      })
+    })
+
+    return timelineData
+  }
+
   const crossTeamDependencies = getCrossTeamDependencies()
   const dependencyChains = getDependencyChains()
+  const riskTimelineData = getRiskTimelineData()
 
   const filteredDependencies = crossTeamDependencies.filter((dep) => {
     const teamMatch =
@@ -154,13 +216,21 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
     return teamMatch && sprintMatch
   })
 
+  const sortedDependencies = [...filteredDependencies].sort((a, b) => {
+    if (a.status === "completed" && b.status !== "completed") return 1
+    if (a.status !== "completed" && b.status === "completed") return -1
+    if (a.status === "blocked" && b.status !== "blocked") return -1
+    if (a.status !== "blocked" && b.status === "blocked") return 1
+    return 0
+  })
+
   const filteredDependencyChains = dependencyChains.filter((chain) => {
     const teamMatch = selectedTeam === "all" || chain.teams.some((team) => team.id === selectedTeam)
     const sprintMatch = selectedSprint === "all" || chain.issues.some((issue) => issue.sprintId === selectedSprint)
     return teamMatch && sprintMatch
   })
 
-  const filteredCriticalChains = filteredDependencyChains.filter((chain) => chain.criticalPath)
+  const criticalPathChains = filteredDependencyChains.filter((chain) => chain.criticalPath)
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -178,23 +248,36 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case "high":
-        return "text-red-500 bg-red-50 border-red-200"
+        return "bg-[var(--risk-high-bg)] text-[var(--risk-high-text)] border-[var(--risk-high-border)]"
       case "medium":
-        return "text-yellow-500 bg-yellow-50 border-yellow-200"
+        return "bg-[var(--risk-medium-bg)] text-[var(--risk-medium-text)] border-[var(--risk-medium-border)]"
       default:
-        return "text-green-500 bg-green-50 border-green-200"
+        return "bg-[var(--risk-low-bg)] text-[var(--risk-low-text)] border-[var(--risk-low-border)]"
     }
   }
 
   const getChainStatusColor = (status: string) => {
     switch (status) {
       case "blocked":
-        return "text-red-500 bg-red-50 border-red-200"
+        return "bg-[var(--health-blocked-bg)] text-[var(--health-blocked-text)] border-[var(--health-blocked-border)]"
       case "at_risk":
-        return "text-yellow-500 bg-yellow-50 border-yellow-200"
+        return "bg-[var(--health-at-risk-bg)] text-[var(--health-at-risk-text)] border-[var(--health-at-risk-border)]"
       default:
-        return "text-green-500 bg-green-50 border-green-200"
+        return "bg-[var(--health-healthy-bg)] text-[var(--health-healthy-text)] border-[var(--health-healthy-border)]"
     }
+  }
+
+  const getImpactAnalysis = (chain: DependencyChain) => {
+    const blockedIssues = chain.issues.filter((i) => i.blockedReason)
+    const affectedIssues = chain.issues.length - blockedIssues.length
+    const affectedTeams = chain.teams.length
+
+    if (blockedIssues.length > 0) {
+      return `${blockedIssues.length} blocked task(s) affecting ${affectedIssues} downstream task(s) across ${affectedTeams} team(s)`
+    }
+
+    const avgDelay = 2 // Example: 2 days delay
+    return `If any task delays ${avgDelay} days, affects ${affectedIssues} task(s) across ${affectedTeams} team(s)`
   }
 
   const dependencyStats = {
@@ -204,10 +287,76 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
     completed: crossTeamDependencies.filter((d) => d.status === "completed").length,
   }
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload as RiskTimelineData
+      return (
+        <div className="bg-card border border-border rounded-lg shadow-lg p-3">
+          <p className="font-semibold mb-2">{data.month}</p>
+          <div className="space-y-1 text-sm">
+            {data.critical > 0 && (
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-red-600">Critical:</span>
+                <span className="font-medium">{data.critical} tasks</span>
+              </div>
+            )}
+            {data.high > 0 && (
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-orange-600">High:</span>
+                <span className="font-medium">{data.high} tasks</span>
+              </div>
+            )}
+            {data.medium > 0 && (
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-yellow-600">Medium:</span>
+                <span className="font-medium">{data.medium} tasks</span>
+              </div>
+            )}
+            {data.low > 0 && (
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-green-600">Low:</span>
+                <span className="font-medium">{data.low} tasks</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
+
+  const handleAreaClick = (data: any, riskLevel: string) => {
+    if (data && data.activePayload && data.activePayload[0]) {
+      const payload = data.activePayload[0].payload as RiskTimelineData
+      let tasks: EnhancedIssue[] = []
+
+      switch (riskLevel) {
+        case "critical":
+          tasks = payload.criticalTasks
+          break
+        case "high":
+          tasks = payload.highTasks
+          break
+        case "medium":
+          tasks = payload.mediumTasks
+          break
+        case "low":
+          tasks = payload.lowTasks
+          break
+      }
+
+      if (tasks.length > 0) {
+        setSelectedRiskData({
+          month: payload.month,
+          riskLevel: riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1),
+          tasks,
+        })
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
-      
-
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -259,54 +408,58 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
         </Card>
       </div>
 
-      <Tabs defaultValue="dependencies" className="space-y-4">
-        <div className="flex items-center justify-between gap-8">
-          <TabsList>
-            <TabsTrigger value="dependencies">Dependencies Map</TabsTrigger>
-            <TabsTrigger value="chains">Dependency Chains</TabsTrigger>
-            <TabsTrigger value="critical">Critical Path</TabsTrigger>
-          </TabsList>
-          <div className="flex items-center space-x-4 flex-row">
-            <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select team" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Teams</SelectItem>
-                {teams.map((team) => (
-                  <SelectItem key={team.id} value={team.id}>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: team.color }} />
-                      <span>{team.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={selectedSprint} onValueChange={setSelectedSprint}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select sprint" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sprints</SelectItem>
-                {sprints.map((sprint) => (
-                  <SelectItem key={sprint.id} value={sprint.id}>
-                    {sprint.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+      <div className="flex items-center space-x-4 justify-end">
+        <h3 className="w-full text-lg font-semibold mx-0">Dependencies Map</h3>
+        <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Select team" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Teams</SelectItem>
+            {teams.map((team) => (
+              <SelectItem key={team.id} value={team.id}>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: team.color }} />
+                  <span>{team.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={selectedSprint} onValueChange={setSelectedSprint}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Select sprint" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Sprints</SelectItem>
+            {sprints.map((sprint) => (
+              <SelectItem key={sprint.id} value={sprint.id}>
+                {sprint.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        <TabsContent value="dependencies" className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Dependency Graph (2/3 width) - Sorted with incomplete first */}
+        <div className="lg:col-span-2 space-y-4">
           <div className="space-y-4">
-            {filteredDependencies.map((dependency, index) => {
+            {sortedDependencies.map((dependency, index) => {
               const dependentAssignee = teamMembers.find((m) => m.name === dependency.dependentIssue.assignee)
               const dependsOnAssignee = teamMembers.find((m) => m.name === dependency.dependsOnIssue.assignee)
+              const isCompleted = dependency.status === "completed"
 
               return (
-                <Card key={index} className={cn("border-l-4", getRiskColor(dependency.riskLevel))}>
+                <Card
+                  key={index}
+                  className={cn(
+                    "border-l-4 transition-opacity",
+                    isCompleted && "opacity-50",
+                    dependency.status === "blocked" && "border-l-red-500",
+                    dependency.status !== "blocked" && getRiskColor(dependency.riskLevel),
+                  )}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-2">
@@ -320,7 +473,7 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
                       </Badge>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
                       {/* Dependent Issue */}
                       <div className="space-y-3">
                         <div className="flex items-center space-x-2">
@@ -340,9 +493,12 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
                             <Badge
                               className={cn(
                                 "text-xs",
-                                dependency.dependentIssue.priority === "P0" && "bg-red-500",
-                                dependency.dependentIssue.priority === "P1" && "bg-orange-500",
-                                dependency.dependentIssue.priority === "P2" && "bg-yellow-500",
+                                dependency.dependentIssue.priority === "P0" &&
+                                  "bg-[var(--priority-p0-bg)] text-[var(--priority-p0-text)]",
+                                dependency.dependentIssue.priority === "P1" &&
+                                  "bg-[var(--priority-p1-bg)] text-[var(--priority-p1-text)]",
+                                dependency.dependentIssue.priority === "P2" &&
+                                  "bg-[var(--priority-p2-bg)] text-[var(--priority-p2-text)]",
                               )}
                             >
                               {dependency.dependentIssue.priority}
@@ -367,9 +523,7 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
                       </div>
 
                       {/* Arrow */}
-                      <div className="flex items-center justify-center">
-                        <ArrowRight className="h-6 w-6 text-muted-foreground" />
-                      </div>
+                      <ArrowRight className="h-6 w-6 text-muted-foreground" />
 
                       {/* Dependency Issue */}
                       <div className="space-y-3">
@@ -390,9 +544,12 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
                             <Badge
                               className={cn(
                                 "text-xs",
-                                dependency.dependsOnIssue.status === "Done" && "bg-green-500",
-                                dependency.dependsOnIssue.status === "In Progress" && "bg-blue-500",
-                                dependency.dependsOnIssue.status === "Todo" && "bg-gray-500",
+                                dependency.dependsOnIssue.status === "Done" &&
+                                  "bg-[var(--status-done-bg)] text-[var(--status-done-text)]",
+                                dependency.dependsOnIssue.status === "In Progress" &&
+                                  "bg-[var(--status-in-progress-bg)] text-[var(--status-in-progress-text)]",
+                                dependency.dependsOnIssue.status === "Todo" &&
+                                  "bg-[var(--status-todo-bg)] text-[var(--status-todo-text)]",
                               )}
                             >
                               {dependency.dependsOnIssue.status}
@@ -414,10 +571,10 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
                             </div>
                           )}
                           {dependency.dependsOnIssue.blockedReason && (
-                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                            <div className="mt-2 p-2 bg-[var(--health-blocked-bg)] border border-[var(--health-blocked-border)] rounded-md">
                               <div className="flex items-center space-x-1">
-                                <AlertTriangle className="h-3 w-3 text-red-500" />
-                                <span className="text-xs text-red-800">
+                                <AlertTriangle className="h-3 w-3 text-[var(--health-blocked-text)]" />
+                                <span className="text-xs text-[var(--health-blocked-text)]">
                                   Blocked: {dependency.dependsOnIssue.blockedReason}
                                 </span>
                               </div>
@@ -431,164 +588,226 @@ export function DependenciesView({ issues, teams, teamMembers, sprints }: Depend
               )
             })}
 
-            {filteredDependencies.length === 0 && (
+            {sortedDependencies.length === 0 && (
               <div className="text-center py-8">
                 <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No cross-team dependencies found.</p>
               </div>
             )}
           </div>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="chains" className="space-y-4">
-          <div className="space-y-4">
-            {filteredDependencyChains.map((chain) => (
-              <Card key={chain.id} className={cn("border-l-4", getChainStatusColor(chain.status))}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{chain.name}</CardTitle>
-                    <div className="flex items-center space-x-2">
-                      {chain.criticalPath && (
-                        <Badge variant="destructive" className="text-xs">
-                          <Target className="h-3 w-3 mr-1" />
-                          Critical Path
+        <div className="lg:col-span-1">
+          <Card className="sticky top-20">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-red-500" />
+                <span>Risk Timeline</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-sm text-muted-foreground mb-4">
+                Click on any area to see tasks at that risk level
+              </div>
+
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart
+                  data={riskTimelineData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                  onClick={(data) => {
+                    // Determine which area was clicked based on the data
+                    if (data && data.activePayload) {
+                      const payload = data.activePayload[0].payload as RiskTimelineData
+                      // Show dialog with all risk levels for this month
+                      const allTasks = [
+                        ...payload.criticalTasks,
+                        ...payload.highTasks,
+                        ...payload.mediumTasks,
+                        ...payload.lowTasks,
+                      ]
+                      if (allTasks.length > 0) {
+                        setSelectedRiskData({
+                          month: payload.month,
+                          riskLevel: "All",
+                          tasks: allTasks,
+                        })
+                      }
+                    }
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
+                  <Tooltip content={<CustomTooltip />} />
+
+                  {/* Stacked areas for each risk level */}
+                  <Area
+                    type="monotone"
+                    dataKey="low"
+                    stackId="1"
+                    stroke="hsl(var(--chart-1))"
+                    fill="hsl(var(--chart-1))"
+                    fillOpacity={0.6}
+                    onClick={(data) => handleAreaClick(data, "low")}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="medium"
+                    stackId="1"
+                    stroke="hsl(var(--chart-2))"
+                    fill="hsl(var(--chart-2))"
+                    fillOpacity={0.6}
+                    onClick={(data) => handleAreaClick(data, "medium")}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="high"
+                    stackId="1"
+                    stroke="hsl(var(--chart-3))"
+                    fill="hsl(var(--chart-3))"
+                    fillOpacity={0.6}
+                    onClick={(data) => handleAreaClick(data, "high")}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="critical"
+                    stackId="1"
+                    stroke="hsl(var(--chart-4))"
+                    fill="hsl(var(--chart-4))"
+                    fillOpacity={0.6}
+                    onClick={(data) => handleAreaClick(data, "critical")}
+                    style={{ cursor: "pointer" }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+
+              {/* Legend */}
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-1))]" />
+                  <span>Low Risk</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-2))]" />
+                  <span>Medium Risk</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-3))]" />
+                  <span>High Risk</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-[hsl(var(--chart-4))]" />
+                  <span>Critical</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="pt-4 border-t">
+                <div className="flex items-center gap-2 text-sm">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">
+                    {riskTimelineData.reduce((sum, d) => sum + d.critical + d.high, 0)} high-priority tasks tracked
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Dialog open={!!selectedRiskData} onOpenChange={() => setSelectedRiskData(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedRiskData?.riskLevel} Risk Tasks - {selectedRiskData?.month}
+            </DialogTitle>
+            <DialogDescription>{selectedRiskData?.tasks.length} task(s) at this risk level</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            {selectedRiskData?.tasks.map((task) => {
+              const assignee = teamMembers.find((m) => m.name === task.assignee)
+              const team = teams.find((t) => t.id === task.teamId)
+
+              return (
+                <Card key={task.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="text-xs">
+                          {task.id}
                         </Badge>
-                      )}
-                      <Badge variant="outline" className={getChainStatusColor(chain.status)}>
-                        {chain.status.replace("_", " ").toUpperCase()}
+                        {team && (
+                          <div className="flex items-center space-x-1">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color }} />
+                            <span className="text-xs text-muted-foreground">{team.name}</span>
+                          </div>
+                        )}
+                      </div>
+                      <Badge
+                        className={cn(
+                          "text-xs",
+                          task.priority === "P0" && "bg-[var(--priority-p0-bg)] text-[var(--priority-p0-text)]",
+                          task.priority === "P1" && "bg-[var(--priority-p1-bg)] text-[var(--priority-p1-text)]",
+                          task.priority === "P2" && "bg-[var(--priority-p2-bg)] text-[var(--priority-p2-text)]",
+                        )}
+                      >
+                        {task.priority}
                       </Badge>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Teams Involved */}
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Teams Involved</h4>
-                    <div className="flex space-x-2">
-                      {chain.teams.map((team) => (
-                        <Badge key={team.id} variant="secondary" className="flex items-center space-x-1">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color }} />
-                          <span>{team.name}</span>
-                        </Badge>
-                      ))}
+
+                    <h4 className="font-medium text-sm mb-2">{task.title}</h4>
+
+                    <div className="flex items-center justify-between">
+                      {assignee && (
+                        <div className="flex items-center space-x-2">
+                          <Avatar className="h-5 w-5">
+                            <AvatarImage src={assignee.avatar || "/placeholder.svg"} />
+                            <AvatarFallback className="text-xs">
+                              {assignee.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs text-muted-foreground">{assignee.name}</span>
+                        </div>
+                      )}
+
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-xs",
+                          task.status === "Done" && "bg-[var(--status-done-bg)] text-[var(--status-done-text)]",
+                          task.status === "In Progress" &&
+                            "bg-[var(--status-in-progress-bg)] text-[var(--status-in-progress-text)]",
+                          task.status === "Todo" && "bg-[var(--status-todo-bg)] text-[var(--status-todo-text)]",
+                        )}
+                      >
+                        {task.status}
+                      </Badge>
                     </div>
-                  </div>
 
-                  {/* Chain Issues */}
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Issue Chain ({chain.issues.length} issues)</h4>
-                    <div className="space-y-2">
-                      {chain.issues.map((issue, index) => {
-                        const team = teams.find((t) => t.id === issue.teamId)
-                        const assignee = teamMembers.find((m) => m.name === issue.assignee)
-
-                        return (
-                          <div key={issue.id} className="flex items-center space-x-3 p-2 bg-muted/30 rounded-md">
-                            <div className="text-sm font-mono text-muted-foreground">{index + 1}</div>
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {issue.id}
-                                </Badge>
-                                {team && (
-                                  <div className="flex items-center space-x-1">
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color }} />
-                                    <span className="text-xs text-muted-foreground">{team.name}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <p className="text-sm font-medium">{issue.title}</p>
-                              {assignee && (
-                                <div className="flex items-center space-x-1 mt-1">
-                                  <Avatar className="h-4 w-4">
-                                    <AvatarImage src={assignee.avatar || "/placeholder.svg"} />
-                                    <AvatarFallback className="text-xs">
-                                      {assignee.name
-                                        .split(" ")
-                                        .map((n) => n[0])
-                                        .join("")}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-xs text-muted-foreground">{assignee.name}</span>
-                                </div>
-                              )}
-                            </div>
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "text-xs",
-                                issue.status === "Done" && "bg-green-100 text-green-800",
-                                issue.status === "In Progress" && "bg-blue-100 text-blue-800",
-                                issue.blockedReason && "bg-red-100 text-red-800",
-                              )}
-                            >
-                              {issue.blockedReason ? "Blocked" : issue.status}
-                            </Badge>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Duration Estimate */}
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-sm text-muted-foreground">Estimated Duration</span>
-                    <span className="text-sm font-medium">{chain.estimatedDuration}h</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {filteredDependencyChains.length === 0 && (
-              <div className="text-center py-8">
-                <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No dependency chains found.</p>
-              </div>
-            )}
+                    {task.blockedReason && (
+                      <div className="mt-2 p-2 bg-[var(--health-blocked-bg)] border border-[var(--health-blocked-border)] rounded-md">
+                        <div className="flex items-center space-x-1">
+                          <AlertTriangle className="h-3 w-3 text-[var(--health-blocked-text)]" />
+                          <span className="text-xs text-[var(--health-blocked-text)]">
+                            Blocked: {task.blockedReason}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
-        </TabsContent>
-
-        <TabsContent value="critical" className="space-y-4">
-          <div className="space-y-4">
-            {filteredCriticalChains.map((chain) => (
-              <Card key={chain.id} className="border-l-4 border-l-red-500 bg-red-50/50">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg flex items-center space-x-2">
-                      <Target className="h-5 w-5 text-red-500" />
-                      <span>{chain.name}</span>
-                    </CardTitle>
-                    <Badge variant="destructive">Critical Path</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{chain.issues.length}</div>
-                      <div className="text-xs text-muted-foreground">Issues in Chain</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{chain.teams.length}</div>
-                      <div className="text-xs text-muted-foreground">Teams Involved</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{chain.estimatedDuration}h</div>
-                      <div className="text-xs text-muted-foreground">Est. Duration</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {filteredCriticalChains.length === 0 && (
-              <div className="text-center py-8">
-                <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No critical path dependencies identified.</p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

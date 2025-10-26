@@ -1,13 +1,27 @@
 "use client"
 
+import { TableCell } from "@/components/ui/table"
+
+import { TableBody } from "@/components/ui/table"
+
+import { Button } from "@/components/ui/button"
+
+import { TableHead } from "@/components/ui/table"
+
+import { TableRow } from "@/components/ui/table"
+
+import { TableHeader } from "@/components/ui/table"
+
+import { Table } from "@/components/ui/table"
+
 import { useState } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Users, TrendingUp, TrendingDown, AlertTriangle, Star, Target, Activity } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Users, TrendingDown, AlertTriangle, Activity, FileText, X, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { TeamMember, Team, EnhancedIssue, Sprint } from "@/types"
 
@@ -28,9 +42,30 @@ interface MemberStats {
   performanceScore: number
 }
 
+/**
+ * PeopleCapacityView - Consolidated team capacity overview
+ *
+ * Connected Components:
+ * - Uses @/components/ui/table for capacity table
+ * - Uses @/components/ui/popover and @/components/ui/checkbox for multi-select filters
+ * - Uses side panel overlay for skills matrix
+ * - Integrates with team and member data
+ *
+ * Structure:
+ * - Top: Team stats summary cards
+ * - Main: Capacity table with filterable headers and capacity bars
+ * - Side Panel: Skills matrix overlay (triggered by icon click)
+ */
 export function PeopleCapacityView({ teamMembers, teams, issues, sprints }: PeopleCapacityViewProps) {
-  const [selectedTeam, setSelectedTeam] = useState<string>("all")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(teams.map((t) => t.id))
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
+    "Overloaded",
+    "At Capacity",
+    "Optimal",
+    "Underutilized",
+  ])
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+  const [isSkillsPanelOpen, setIsSkillsPanelOpen] = useState(false)
 
   const activeSprint = sprints.find((sprint) => sprint.status === "Active")
 
@@ -44,7 +79,6 @@ export function PeopleCapacityView({ teamMembers, teams, issues, sprints }: Peop
 
     const utilizationRate = member.capacity > 0 ? (member.currentWorkload / member.capacity) * 100 : 0
 
-    // Mock performance score based on completion rate and utilization
     const completionRate = memberIssues.length > 0 ? (completedIssues.length / memberIssues.length) * 100 : 0
     const performanceScore = Math.min(100, completionRate * 0.6 + Math.min(utilizationRate, 100) * 0.4)
 
@@ -60,27 +94,45 @@ export function PeopleCapacityView({ teamMembers, teams, issues, sprints }: Peop
   }
 
   const getCapacityStatus = (utilizationRate: number) => {
-    if (utilizationRate >= 100) return { status: "overloaded", color: "text-red-500", bg: "bg-red-50 border-red-200" }
+    if (utilizationRate >= 100)
+      return {
+        status: "Overloaded",
+        variant: "default" as const,
+        className:
+          "bg-[var(--capacity-overloaded-bg)] text-[var(--capacity-overloaded-text)] border-[var(--capacity-overloaded-border)]",
+      }
     if (utilizationRate >= 85)
-      return { status: "at_capacity", color: "text-yellow-500", bg: "bg-yellow-50 border-yellow-200" }
-    if (utilizationRate >= 60) return { status: "optimal", color: "text-green-500", bg: "bg-green-50 border-green-200" }
-    return { status: "underutilized", color: "text-blue-500", bg: "bg-blue-50 border-blue-200" }
+      return {
+        status: "At Capacity",
+        variant: "default" as const,
+        className:
+          "bg-[var(--capacity-at-capacity-bg)] text-[var(--capacity-at-capacity-text)] border-[var(--capacity-at-capacity-border)]",
+      }
+    if (utilizationRate >= 60)
+      return {
+        status: "Optimal",
+        variant: "default" as const,
+        className:
+          "bg-[var(--capacity-optimal-bg)] text-[var(--capacity-optimal-text)] border-[var(--capacity-optimal-border)]",
+      }
+    return {
+      status: "Underutilized",
+      variant: "secondary" as const,
+      className:
+        "bg-[var(--capacity-underutilized-bg)] text-[var(--capacity-underutilized-text)] border-[var(--capacity-underutilized-border)]",
+    }
   }
 
-  const getPerformanceLevel = (score: number) => {
-    if (score >= 90) return { level: "Excellent", color: "text-green-600", icon: Star }
-    if (score >= 75) return { level: "Good", color: "text-blue-600", icon: TrendingUp }
-    if (score >= 60) return { level: "Average", color: "text-yellow-600", icon: Target }
-    return { level: "Needs Attention", color: "text-red-600", icon: AlertTriangle }
-  }
+  const filteredMembers = teamMembers.filter((member) => {
+    const memberTeam = teams.find((t) => t.memberIds.includes(member.id))
+    const stats = getMemberStats(member)
+    const capacityStatus = getCapacityStatus(stats.utilizationRate)
 
-  const filteredMembers =
-    selectedTeam === "all"
-      ? teamMembers
-      : teamMembers.filter((member) => {
-          const team = teams.find((t) => t.memberIds.includes(member.id))
-          return team?.id === selectedTeam
-        })
+    const teamMatch = !memberTeam || selectedTeamIds.includes(memberTeam.id)
+    const statusMatch = selectedStatuses.includes(capacityStatus.status)
+
+    return teamMatch && statusMatch
+  })
 
   const teamStats = {
     totalMembers: filteredMembers.length,
@@ -90,34 +142,39 @@ export function PeopleCapacityView({ teamMembers, teams, issues, sprints }: Peop
       filteredMembers.reduce((sum, m) => sum + getMemberStats(m).utilizationRate, 0) / filteredMembers.length || 0,
   }
 
+  const toggleTeam = (teamId: string) => {
+    setSelectedTeamIds((prev) => (prev.includes(teamId) ? prev.filter((id) => id !== teamId) : [...prev, teamId]))
+  }
+
+  const toggleAllTeams = () => {
+    setSelectedTeamIds((prev) => (prev.length === teams.length ? [] : teams.map((t) => t.id)))
+  }
+
+  const toggleStatus = (status: string) => {
+    setSelectedStatuses((prev) => (prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]))
+  }
+
+  const toggleAllStatuses = () => {
+    const allStatuses = ["Overloaded", "At Capacity", "Optimal", "Underutilized"]
+    setSelectedStatuses((prev) => (prev.length === allStatuses.length ? [] : allStatuses))
+  }
+
+  const handleOpenSkillsPanel = (member: TeamMember) => {
+    setSelectedMember(member)
+    setIsSkillsPanelOpen(true)
+  }
+
+  const handleCloseSkillsPanel = () => {
+    setIsSkillsPanelOpen(false)
+    setTimeout(() => setSelectedMember(null), 300)
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">People & Capacity</h2>
-          <p className="text-muted-foreground">Monitor team member workloads and performance</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select team" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Teams</SelectItem>
-              {teams.map((team) => (
-                <SelectItem key={team.id} value={team.id}>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: team.color }} />
-                    <span>{team.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      {/* === HEADER SECTION === */}
+      
 
-      {/* Team Overview Stats */}
+      {/* === TEAM OVERVIEW STATS === */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -168,248 +225,329 @@ export function PeopleCapacityView({ teamMembers, teams, issues, sprints }: Peop
         </Card>
       </div>
 
-      <Tabs defaultValue="capacity" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="capacity">Capacity Overview</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="skills">Skills Matrix</TabsTrigger>
-        </TabsList>
+      {/* === CAPACITY OVERVIEW TABLE === */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Capacity Overview</h3>
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[250px]">Team Member</TableHead>
 
-        <TabsContent value="capacity" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredMembers.map((member) => {
-              const stats = getMemberStats(member)
-              const capacityStatus = getCapacityStatus(stats.utilizationRate)
-              const memberTeam = teams.find((team) => team.memberIds.includes(member.id))
-
-              return (
-                <Card key={member.id} className={cn("hover:shadow-md transition-shadow", capacityStatus.bg)}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={member.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>
-                          {member.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate">{member.name}</h3>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
-                        {memberTeam && (
-                          <div className="flex items-center space-x-1 mt-1">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: memberTeam.color }} />
-                            <span className="text-xs text-muted-foreground">{memberTeam.name}</span>
+                  <TableHead>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-auto px-0 py-0 font-medium hover:bg-transparent">
+                          Team
+                          <ChevronDown className="ml-1 h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-3" align="start">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Filter by Team</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto px-2 py-1 text-xs"
+                              onClick={toggleAllTeams}
+                            >
+                              {selectedTeamIds.length === teams.length ? "Deselect All" : "Select All"}
+                            </Button>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="space-y-4">
-                    {/* Capacity Utilization */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Capacity</span>
-                        <span className={capacityStatus.color}>{Math.round(stats.utilizationRate)}%</span>
-                      </div>
-                      <Progress
-                        value={Math.min(stats.utilizationRate, 100)}
-                        className={cn(
-                          "h-2",
-                          stats.utilizationRate >= 100 && "[&>div]:bg-red-500",
-                          stats.utilizationRate >= 85 && stats.utilizationRate < 100 && "[&>div]:bg-yellow-500",
-                        )}
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>{member.currentWorkload}h used</span>
-                        <span>{member.capacity}h total</span>
-                      </div>
-                    </div>
-
-                    {/* Current Work Status */}
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div>
-                        <div className="text-lg font-semibold">{stats.totalIssues}</div>
-                        <div className="text-xs text-muted-foreground">Total</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-semibold text-blue-600">{stats.inProgressIssues}</div>
-                        <div className="text-xs text-muted-foreground">Active</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-semibold text-green-600">{stats.completedIssues}</div>
-                        <div className="text-xs text-muted-foreground">Done</div>
-                      </div>
-                    </div>
-
-                    {/* Status Badge */}
-                    <Badge variant="outline" className={cn("w-full justify-center", capacityStatus.color)}>
-                      {capacityStatus.status.replace("_", " ").toUpperCase()}
-                    </Badge>
-
-                    {/* Blocked Issues Warning */}
-                    {stats.blockedIssues > 0 && (
-                      <div className="flex items-center space-x-2 p-2 bg-red-50 border border-red-200 rounded-md">
-                        <AlertTriangle className="h-4 w-4 text-red-500" />
-                        <span className="text-sm text-red-800">
-                          {stats.blockedIssues} blocked issue{stats.blockedIssues > 1 ? "s" : ""}
-                        </span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredMembers.map((member) => {
-              const stats = getMemberStats(member)
-              const performance = getPerformanceLevel(stats.performanceScore)
-              const PerformanceIcon = performance.icon
-              const memberTeam = teams.find((team) => team.memberIds.includes(member.id))
-
-              return (
-                <Card key={member.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={member.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>
-                          {member.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate">{member.name}</h3>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
-                        {memberTeam && (
-                          <div className="flex items-center space-x-1 mt-1">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: memberTeam.color }} />
-                            <span className="text-xs text-muted-foreground">{memberTeam.name}</span>
+                          <div className="space-y-2">
+                            {teams.map((team) => (
+                              <div key={team.id} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`team-${team.id}`}
+                                  checked={selectedTeamIds.includes(team.id)}
+                                  onCheckedChange={() => toggleTeam(team.id)}
+                                />
+                                <label
+                                  htmlFor={`team-${team.id}`}
+                                  className="flex items-center space-x-2 text-sm cursor-pointer flex-1"
+                                >
+                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color }} />
+                                  <span>{team.name}</span>
+                                </label>
+                              </div>
+                            ))}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="space-y-4">
-                    {/* Performance Score */}
-                    <div className="text-center">
-                      <div className="text-3xl font-bold mb-1">{Math.round(stats.performanceScore)}</div>
-                      <div className="flex items-center justify-center space-x-1">
-                        <PerformanceIcon className={cn("h-4 w-4", performance.color)} />
-                        <span className={cn("text-sm font-medium", performance.color)}>{performance.level}</span>
-                      </div>
-                    </div>
-
-                    {/* Performance Metrics */}
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Completion Rate</span>
-                          <span>
-                            {stats.totalIssues > 0 ? Math.round((stats.completedIssues / stats.totalIssues) * 100) : 0}%
-                          </span>
                         </div>
-                        <Progress
-                          value={stats.totalIssues > 0 ? (stats.completedIssues / stats.totalIssues) * 100 : 0}
-                          className="h-2"
-                        />
-                      </div>
+                      </PopoverContent>
+                    </Popover>
+                  </TableHead>
 
-                      <div className="grid grid-cols-2 gap-4 pt-2 border-t">
-                        <div className="text-center">
-                          <div className="text-lg font-semibold">{stats.avgCompletionTime}d</div>
-                          <div className="text-xs text-muted-foreground">Avg Time</div>
+                  <TableHead>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-auto px-0 py-0 font-medium hover:bg-transparent">
+                          Status
+                          <ChevronDown className="ml-1 h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-3" align="start">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">Filter by Status</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto px-2 py-1 text-xs"
+                              onClick={toggleAllStatuses}
+                            >
+                              {selectedStatuses.length === 4 ? "Deselect All" : "Select All"}
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            {["Overloaded", "At Capacity", "Optimal", "Underutilized"].map((status) => (
+                              <div key={status} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`status-${status}`}
+                                  checked={selectedStatuses.includes(status)}
+                                  onCheckedChange={() => toggleStatus(status)}
+                                />
+                                <label htmlFor={`status-${status}`} className="text-sm cursor-pointer flex-1">
+                                  {status}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="text-center">
-                          <div className="text-lg font-semibold">{Math.round(stats.utilizationRate)}%</div>
-                          <div className="text-xs text-muted-foreground">Utilization</div>
+                      </PopoverContent>
+                    </Popover>
+                  </TableHead>
+
+                  <TableHead className="w-[300px]">Capacity</TableHead>
+                  <TableHead className="text-center">Active</TableHead>
+                  <TableHead className="text-center">Completed</TableHead>
+                  <TableHead className="text-center">Blocked</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredMembers.map((member) => {
+                  const stats = getMemberStats(member)
+                  const capacityStatus = getCapacityStatus(stats.utilizationRate)
+                  const memberTeam = teams.find((team) => team.memberIds.includes(member.id))
+
+                  return (
+                    <TableRow key={member.id}>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={member.avatar || "/placeholder.svg"} />
+                            <AvatarFallback>
+                              {member.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{member.name}</div>
+                            <div className="text-xs text-muted-foreground">{member.role}</div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        </TabsContent>
+                      </TableCell>
 
-        <TabsContent value="skills" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredMembers.map((member) => {
-              const memberTeam = teams.find((team) => team.memberIds.includes(member.id))
-
-              return (
-                <Card key={member.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={member.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>
-                          {member.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate">{member.name}</h3>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
+                      <TableCell>
                         {memberTeam && (
-                          <div className="flex items-center space-x-1 mt-1">
+                          <div className="flex items-center space-x-2">
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: memberTeam.color }} />
-                            <span className="text-xs text-muted-foreground">{memberTeam.name}</span>
+                            <span className="text-sm">{memberTeam.name}</span>
                           </div>
                         )}
-                      </div>
-                    </div>
-                  </CardHeader>
+                      </TableCell>
 
-                  <CardContent className="space-y-4">
-                    {/* Skills */}
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">Skills</h4>
-                      <div className="space-y-2">
-                        {member.skills.map((skill) => (
-                          <div key={skill.name}>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span>{skill.name}</span>
-                              <span className="text-muted-foreground">{skill.level}/5</span>
-                            </div>
-                            <Progress value={(skill.level / 5) * 100} className="h-1" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Availability */}
-                    <div className="pt-2 border-t">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Availability</span>
-                        <Badge
-                          variant={member.availability === "Available" ? "default" : "secondary"}
-                          className="text-xs"
-                        >
-                          {member.availability}
+                      <TableCell>
+                        <Badge variant="outline" className={cn("text-xs", capacityStatus.className)}>
+                          {capacityStatus.status}
                         </Badge>
-                      </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">
+                              {member.currentWorkload}/{member.capacity}h used - {Math.round(stats.utilizationRate)}%
+                            </span>
+                          </div>
+                          <Progress
+                            value={Math.min(stats.utilizationRate, 100)}
+                            className={cn(
+                              "h-2",
+                              stats.utilizationRate >= 100 && "[&>div]:bg-[var(--progress-danger)]",
+                              stats.utilizationRate >= 85 &&
+                                stats.utilizationRate < 100 &&
+                                "[&>div]:bg-[var(--progress-warning)]",
+                            )}
+                          />
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <span className="text-sm font-medium">{stats.inProgressIssues}</span>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <span className="text-sm font-medium text-green-600">{stats.completedIssues}</span>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        {stats.blockedIssues > 0 ? (
+                          <div className="flex items-center justify-center space-x-1">
+                            <AlertTriangle className="h-3 w-3 text-[var(--health-blocked-text)]" />
+                            <span className="text-sm font-medium text-[var(--health-blocked-text)]">
+                              {stats.blockedIssues}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleOpenSkillsPanel(member)}
+                        >
+                          <FileText className="h-4 w-4" />
+                          <span className="sr-only">View skills matrix</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* === SKILLS MATRIX SIDE PANEL === */}
+      {isSkillsPanelOpen && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40" onClick={handleCloseSkillsPanel} />
+
+          {/* Side Panel */}
+          <div
+            className={cn(
+              "fixed right-0 top-0 h-full w-full md:w-[500px] bg-card border-l shadow-lg z-50",
+              "transform transition-transform duration-300 ease-in-out",
+              isSkillsPanelOpen ? "translate-x-0" : "translate-x-full",
+            )}
+          >
+            {selectedMember && (
+              <div className="flex flex-col h-full">
+                {/* Panel Header */}
+                <div className="flex items-center justify-between p-6 border-b">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={selectedMember.avatar || "/placeholder.svg"} />
+                      <AvatarFallback>
+                        {selectedMember.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold">{selectedMember.name}</h3>
+                      <p className="text-sm text-muted-foreground">{selectedMember.role}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={handleCloseSkillsPanel}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Panel Content */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {/* Team Info */}
+                  {(() => {
+                    const memberTeam = teams.find((team) => team.memberIds.includes(selectedMember.id))
+                    return memberTeam ? (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Team</h4>
+                        <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: memberTeam.color }} />
+                          <span className="text-sm font-medium">{memberTeam.name}</span>
+                        </div>
+                      </div>
+                    ) : null
+                  })()}
+
+                  {/* Skills */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-3">Skills</h4>
+                    <div className="space-y-3">
+                      {selectedMember.skills.map((skill) => (
+                        <div key={skill.name} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-medium">{skill.name}</span>
+                            <span className="text-muted-foreground">{skill.level}/5</span>
+                          </div>
+                          <Progress value={(skill.level / 5) * 100} className="h-2" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Availability */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Availability</h4>
+                    <Badge
+                      variant={selectedMember.availability === "Available" ? "default" : "secondary"}
+                      className="text-sm"
+                    >
+                      {selectedMember.availability}
+                    </Badge>
+                  </div>
+
+                  {/* Current Capacity Stats */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-3">Current Workload</h4>
+                    <div className="space-y-2">
+                      {(() => {
+                        const stats = getMemberStats(selectedMember)
+                        return (
+                          <>
+                            <div className="flex justify-between text-sm p-2 bg-muted rounded">
+                              <span>Total Issues</span>
+                              <span className="font-medium">{stats.totalIssues}</span>
+                            </div>
+                            <div className="flex justify-between text-sm p-2 bg-muted rounded">
+                              <span>In Progress</span>
+                              <span className="font-medium text-blue-600">{stats.inProgressIssues}</span>
+                            </div>
+                            <div className="flex justify-between text-sm p-2 bg-muted rounded">
+                              <span>Completed</span>
+                              <span className="font-medium text-green-600">{stats.completedIssues}</span>
+                            </div>
+                            {stats.blockedIssues > 0 && (
+                              <div className="flex justify-between text-sm p-2 bg-[var(--health-blocked-bg)] border border-[var(--health-blocked-border)] rounded">
+                                <span className="text-[var(--health-blocked-text)]">Blocked</span>
+                                <span className="font-medium text-[var(--health-blocked-text)]">
+                                  {stats.blockedIssues}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
     </div>
   )
 }

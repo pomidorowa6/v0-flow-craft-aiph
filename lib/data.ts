@@ -14,20 +14,22 @@ import type {
 
 // Priority color mapping
 export const priorityColors: Record<Priority, string> = {
-  P0: "bg-red-500 text-white",
-  P1: "bg-orange-500 text-white",
-  P2: "bg-yellow-500 text-black",
-  P3: "bg-blue-500 text-white",
-  P4: "bg-green-500 text-white",
-  P5: "bg-gray-500 text-white",
+  P0: "bg-[var(--priority-p0-bg)] text-[var(--priority-p0-text)] border-[var(--priority-p0-border)]",
+  P1: "bg-[var(--priority-p1-bg)] text-[var(--priority-p1-text)] border-[var(--priority-p1-border)]",
+  P2: "bg-[var(--priority-p2-bg)] text-[var(--priority-p2-text)] border-[var(--priority-p2-border)]",
+  P3: "bg-[var(--priority-p3-bg)] text-[var(--priority-p3-text)] border-[var(--priority-p3-border)]",
+  P4: "bg-[var(--priority-p4-bg)] text-[var(--priority-p4-text)] border-[var(--priority-p4-border)]",
+  P5: "bg-[var(--priority-p5-bg)] text-[var(--priority-p5-text)] border-[var(--priority-p5-border)]",
 }
 
 // Status color mapping
 export const statusColors: Record<IssueStatus, string> = {
-  Todo: "bg-gray-100 text-gray-800 border-gray-200",
-  "In Progress": "bg-blue-100 text-blue-800 border-blue-200",
-  "In Review": "bg-yellow-100 text-yellow-800 border-yellow-200",
-  Done: "bg-green-100 text-green-800 border-green-200",
+  Todo: "bg-[var(--status-todo-bg)] text-[var(--status-todo-text)] border-[var(--status-todo-border)]",
+  "In Progress":
+    "bg-[var(--status-in-progress-bg)] text-[var(--status-in-progress-text)] border-[var(--status-in-progress-border)]",
+  "In Review":
+    "bg-[var(--status-in-review-bg)] text-[var(--status-in-review-text)] border-[var(--status-in-review-border)]",
+  Done: "bg-[var(--status-done-bg)] text-[var(--status-done-text)] border-[var(--status-done-border)]",
 }
 
 // Generate auto-incrementing task ID
@@ -426,14 +428,14 @@ export const initialNotifications: Notification[] = [
 ]
 
 export const businessImpactColors: Record<BusinessImpact, string> = {
-  Critical: "bg-red-500 text-white",
-  High: "bg-orange-500 text-white",
-  Medium: "bg-yellow-500 text-black",
-  Low: "bg-green-500 text-white",
+  Critical: "bg-[var(--impact-critical-bg)] text-[var(--impact-critical-text)] border-[var(--impact-critical-border)]",
+  High: "bg-[var(--impact-high-bg)] text-[var(--impact-high-text)] border-[var(--impact-high-border)]",
+  Medium: "bg-[var(--impact-medium-bg)] text-[var(--impact-medium-text)] border-[var(--impact-medium-border)]",
+  Low: "bg-[var(--impact-low-bg)] text-[var(--impact-low-text)] border-[var(--impact-low-border)]",
 }
 
 export const teamHealthColors: Record<TeamHealthStatus, string> = {
-  healthy: "bg-green-100 text-green-800 border-green-200",
-  at_risk: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  blocked: "bg-red-100 text-red-800 border-red-200",
+  healthy: "bg-[var(--health-healthy-bg)] text-[var(--health-healthy-text)] border-[var(--health-healthy-border)]",
+  at_risk: "bg-[var(--health-at-risk-bg)] text-[var(--health-at-risk-text)] border-[var(--health-at-risk-border)]",
+  blocked: "bg-[var(--health-blocked-bg)] text-[var(--health-blocked-text)] border-[var(--health-blocked-border)]",
 }

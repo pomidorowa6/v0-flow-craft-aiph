@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -37,15 +37,136 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --font-sans: 'Roboto Slab', 'Roboto Slab Fallback';
-  --font-mono: 'Roboto Mono', 'Roboto Mono Fallback';
-  --font-serif: 'Roboto', 'Roboto Fallback';
+  --font-sans: "Roboto Slab", "Roboto Slab Fallback";
+  --font-mono: "Roboto Mono", "Roboto Mono Fallback";
+  --font-serif: "Roboto", "Roboto Fallback";
   --shadow-x: 0px;
   --shadow-y: 1px;
   --shadow-blur: 2px;
   --shadow-spread: 0px;
   --shadow-opacity: 0.05;
   --shadow-color: #000000;
+
+  /* Priority Colors (P0 = most severe, P5 = least severe) */
+  --priority-p0-bg: oklch(0.95 0.05 27.325);
+  --priority-p0-text: oklch(0.45 0.15 27.325);
+  --priority-p0-border: oklch(0.85 0.08 27.325);
+  --priority-p1-bg: oklch(0.95 0.05 50);
+  --priority-p1-text: oklch(0.45 0.15 50);
+  --priority-p1-border: oklch(0.85 0.08 50);
+  --priority-p2-bg: oklch(0.95 0.05 70);
+  --priority-p2-text: oklch(0.45 0.15 70);
+  --priority-p2-border: oklch(0.85 0.08 70);
+  --priority-p3-bg: oklch(0.95 0.03 200);
+  --priority-p3-text: oklch(0.45 0.12 200);
+  --priority-p3-border: oklch(0.85 0.06 200);
+  --priority-p4-bg: oklch(0.97 0.02 0);
+  --priority-p4-text: oklch(0.556 0 0);
+  --priority-p4-border: oklch(0.922 0 0);
+  --priority-p5-bg: oklch(0.97 0.02 0);
+  --priority-p5-text: oklch(0.556 0 0);
+  --priority-p5-border: oklch(0.922 0 0);
+
+  /* Issue Status Colors */
+  --status-todo-bg: oklch(0.97 0.02 0);
+  --status-todo-text: oklch(0.556 0 0);
+  --status-todo-border: oklch(0.922 0 0);
+  --status-todo-dot: oklch(0.708 0 0);
+  --status-in-progress-bg: oklch(0.95 0.03 200);
+  --status-in-progress-text: oklch(0.45 0.12 200);
+  --status-in-progress-border: oklch(0.85 0.06 200);
+  --status-in-progress-dot: oklch(0.6 0.118 184.704);
+  --status-in-review-bg: oklch(0.95 0.05 70);
+  --status-in-review-text: oklch(0.45 0.15 70);
+  --status-in-review-border: oklch(0.85 0.08 70);
+  --status-in-review-dot: oklch(0.769 0.188 70.08);
+  --status-done-bg: oklch(0.95 0.05 142);
+  --status-done-text: oklch(0.35 0.15 142);
+  --status-done-border: oklch(0.85 0.08 142);
+  --status-done-dot: oklch(0.646 0.222 142);
+
+  /* Team Health Status Colors */
+  --health-healthy-bg: oklch(0.95 0.05 142);
+  --health-healthy-text: oklch(0.35 0.15 142);
+  --health-healthy-border: oklch(0.85 0.08 142);
+  --health-at-risk-bg: oklch(0.95 0.05 70);
+  --health-at-risk-text: oklch(0.45 0.15 70);
+  --health-at-risk-border: oklch(0.85 0.08 70);
+  --health-blocked-bg: oklch(0.95 0.05 27.325);
+  --health-blocked-text: oklch(0.45 0.15 27.325);
+  --health-blocked-border: oklch(0.85 0.08 27.325);
+
+  /* Business Impact Colors */
+  --impact-critical-bg: oklch(0.95 0.05 27.325);
+  --impact-critical-text: oklch(0.45 0.15 27.325);
+  --impact-critical-border: oklch(0.85 0.08 27.325);
+  --impact-high-bg: oklch(0.95 0.05 50);
+  --impact-high-text: oklch(0.45 0.15 50);
+  --impact-high-border: oklch(0.85 0.08 50);
+  --impact-medium-bg: oklch(0.95 0.05 70);
+  --impact-medium-text: oklch(0.45 0.15 70);
+  --impact-medium-border: oklch(0.85 0.08 70);
+  --impact-low-bg: oklch(0.97 0.02 0);
+  --impact-low-text: oklch(0.556 0 0);
+  --impact-low-border: oklch(0.922 0 0);
+
+  /* Sprint Status Colors */
+  --sprint-active-bg: oklch(0.95 0.05 142);
+  --sprint-active-text: oklch(0.35 0.15 142);
+  --sprint-active-border: oklch(0.85 0.08 142);
+  --sprint-planned-bg: oklch(0.95 0.03 200);
+  --sprint-planned-text: oklch(0.45 0.12 200);
+  --sprint-planned-border: oklch(0.85 0.06 200);
+  --sprint-completed-bg: oklch(0.97 0.02 0);
+  --sprint-completed-text: oklch(0.556 0 0);
+  --sprint-completed-border: oklch(0.922 0 0);
+
+  /* Capacity Status Colors */
+  --capacity-overloaded-bg: oklch(0.95 0.05 27.325);
+  --capacity-overloaded-text: oklch(0.45 0.15 27.325);
+  --capacity-overloaded-border: oklch(0.85 0.08 27.325);
+  --capacity-at-capacity-bg: oklch(0.95 0.05 70);
+  --capacity-at-capacity-text: oklch(0.45 0.15 70);
+  --capacity-at-capacity-border: oklch(0.85 0.08 70);
+  --capacity-optimal-bg: oklch(0.95 0.05 142);
+  --capacity-optimal-text: oklch(0.35 0.15 142);
+  --capacity-optimal-border: oklch(0.85 0.08 142);
+  --capacity-underutilized-bg: oklch(0.95 0.03 200);
+  --capacity-underutilized-text: oklch(0.45 0.12 200);
+  --capacity-underutilized-border: oklch(0.85 0.06 200);
+
+  /* Notification Type Colors */
+  --notification-blocker-bg: oklch(0.95 0.05 27.325);
+  --notification-blocker-text: oklch(0.45 0.15 27.325);
+  --notification-blocker-border: oklch(0.85 0.08 27.325);
+  --notification-capacity-bg: oklch(0.95 0.05 70);
+  --notification-capacity-text: oklch(0.45 0.15 70);
+  --notification-capacity-border: oklch(0.85 0.08 70);
+  --notification-cross-team-bg: oklch(0.95 0.03 200);
+  --notification-cross-team-text: oklch(0.45 0.12 200);
+  --notification-cross-team-border: oklch(0.85 0.06 200);
+  --notification-weekly-digest-bg: oklch(0.95 0.05 142);
+  --notification-weekly-digest-text: oklch(0.35 0.15 142);
+  --notification-weekly-digest-border: oklch(0.85 0.08 142);
+
+  /* Risk Level Colors */
+  --risk-low-bg: oklch(0.95 0.05 142);
+  --risk-low-text: oklch(0.35 0.15 142);
+  --risk-low-border: oklch(0.85 0.08 142);
+  --risk-low-solid: oklch(0.646 0.222 142);
+  --risk-medium-bg: oklch(0.95 0.05 70);
+  --risk-medium-text: oklch(0.45 0.15 70);
+  --risk-medium-border: oklch(0.85 0.08 70);
+  --risk-medium-solid: oklch(0.769 0.188 70.08);
+  --risk-high-bg: oklch(0.95 0.05 27.325);
+  --risk-high-text: oklch(0.45 0.15 27.325);
+  --risk-high-border: oklch(0.85 0.08 27.325);
+  --risk-high-solid: oklch(0.577 0.245 27.325);
+
+  /* Progress Bar Colors */
+  --progress-normal: oklch(0.646 0.222 142);
+  --progress-warning: oklch(0.769 0.188 70.08);
+  --progress-danger: oklch(0.577 0.245 27.325);
 }
 
 .dark {
@@ -87,11 +208,132 @@
   --shadow-spread: 1px;
   --shadow-opacity: 0.15;
   --shadow-color: #000000;
+
+  /* Priority Colors (P0 = most severe, P5 = least severe) */
+  --priority-p0-bg: oklch(0.25 0.08 27.325);
+  --priority-p0-text: oklch(0.75 0.12 27.325);
+  --priority-p0-border: oklch(0.35 0.12 27.325);
+  --priority-p1-bg: oklch(0.25 0.08 50);
+  --priority-p1-text: oklch(0.75 0.12 50);
+  --priority-p1-border: oklch(0.35 0.12 50);
+  --priority-p2-bg: oklch(0.25 0.08 70);
+  --priority-p2-text: oklch(0.75 0.12 70);
+  --priority-p2-border: oklch(0.35 0.12 70);
+  --priority-p3-bg: oklch(0.25 0.06 200);
+  --priority-p3-text: oklch(0.75 0.09 200);
+  --priority-p3-border: oklch(0.35 0.09 200);
+  --priority-p4-bg: oklch(0.269 0 0);
+  --priority-p4-text: oklch(0.708 0 0);
+  --priority-p4-border: oklch(1 0 0 / 10%);
+  --priority-p5-bg: oklch(0.269 0 0);
+  --priority-p5-text: oklch(0.708 0 0);
+  --priority-p5-border: oklch(1 0 0 / 10%);
+
+  /* Issue Status Colors */
+  --status-todo-bg: oklch(0.269 0 0);
+  --status-todo-text: oklch(0.708 0 0);
+  --status-todo-border: oklch(1 0 0 / 10%);
+  --status-todo-dot: oklch(0.556 0 0);
+  --status-in-progress-bg: oklch(0.25 0.06 200);
+  --status-in-progress-text: oklch(0.75 0.09 200);
+  --status-in-progress-border: oklch(0.35 0.09 200);
+  --status-in-progress-dot: oklch(0.696 0.17 162.48);
+  --status-in-review-bg: oklch(0.25 0.08 70);
+  --status-in-review-text: oklch(0.75 0.12 70);
+  --status-in-review-border: oklch(0.35 0.12 70);
+  --status-in-review-dot: oklch(0.769 0.188 70.08);
+  --status-done-bg: oklch(0.25 0.08 142);
+  --status-done-text: oklch(0.75 0.12 142);
+  --status-done-border: oklch(0.35 0.12 142);
+  --status-done-dot: oklch(0.488 0.243 142);
+
+  /* Team Health Status Colors */
+  --health-healthy-bg: oklch(0.25 0.08 142);
+  --health-healthy-text: oklch(0.75 0.12 142);
+  --health-healthy-border: oklch(0.35 0.12 142);
+  --health-at-risk-bg: oklch(0.25 0.08 70);
+  --health-at-risk-text: oklch(0.75 0.12 70);
+  --health-at-risk-border: oklch(0.35 0.12 70);
+  --health-blocked-bg: oklch(0.25 0.08 27.325);
+  --health-blocked-text: oklch(0.75 0.12 27.325);
+  --health-blocked-border: oklch(0.35 0.12 27.325);
+
+  /* Business Impact Colors */
+  --impact-critical-bg: oklch(0.25 0.08 27.325);
+  --impact-critical-text: oklch(0.75 0.12 27.325);
+  --impact-critical-border: oklch(0.35 0.12 27.325);
+  --impact-high-bg: oklch(0.25 0.08 50);
+  --impact-high-text: oklch(0.75 0.12 50);
+  --impact-high-border: oklch(0.35 0.12 50);
+  --impact-medium-bg: oklch(0.25 0.08 70);
+  --impact-medium-text: oklch(0.75 0.12 70);
+  --impact-medium-border: oklch(0.35 0.12 70);
+  --impact-low-bg: oklch(0.269 0 0);
+  --impact-low-text: oklch(0.708 0 0);
+  --impact-low-border: oklch(1 0 0 / 10%);
+
+  /* Sprint Status Colors */
+  --sprint-active-bg: oklch(0.25 0.08 142);
+  --sprint-active-text: oklch(0.75 0.12 142);
+  --sprint-active-border: oklch(0.35 0.12 142);
+  --sprint-planned-bg: oklch(0.25 0.06 200);
+  --sprint-planned-text: oklch(0.75 0.09 200);
+  --sprint-planned-border: oklch(0.35 0.09 200);
+  --sprint-completed-bg: oklch(0.269 0 0);
+  --sprint-completed-text: oklch(0.708 0 0);
+  --sprint-completed-border: oklch(1 0 0 / 10%);
+
+  /* Capacity Status Colors */
+  --capacity-overloaded-bg: oklch(0.25 0.08 27.325);
+  --capacity-overloaded-text: oklch(0.75 0.12 27.325);
+  --capacity-overloaded-border: oklch(0.35 0.12 27.325);
+  --capacity-at-capacity-bg: oklch(0.25 0.08 70);
+  --capacity-at-capacity-text: oklch(0.75 0.12 70);
+  --capacity-at-capacity-border: oklch(0.35 0.12 70);
+  --capacity-optimal-bg: oklch(0.25 0.08 142);
+  --capacity-optimal-text: oklch(0.75 0.12 142);
+  --capacity-optimal-border: oklch(0.35 0.12 142);
+  --capacity-underutilized-bg: oklch(0.25 0.06 200);
+  --capacity-underutilized-text: oklch(0.75 0.09 200);
+  --capacity-underutilized-border: oklch(0.35 0.09 200);
+
+  /* Notification Type Colors */
+  --notification-blocker-bg: oklch(0.25 0.08 27.325);
+  --notification-blocker-text: oklch(0.75 0.12 27.325);
+  --notification-blocker-border: oklch(0.35 0.12 27.325);
+  --notification-capacity-bg: oklch(0.25 0.08 70);
+  --notification-capacity-text: oklch(0.75 0.12 70);
+  --notification-capacity-border: oklch(0.35 0.12 70);
+  --notification-cross-team-bg: oklch(0.25 0.06 200);
+  --notification-cross-team-text: oklch(0.75 0.09 200);
+  --notification-cross-team-border: oklch(0.35 0.09 200);
+  --notification-weekly-digest-bg: oklch(0.25 0.08 142);
+  --notification-weekly-digest-text: oklch(0.75 0.12 142);
+  --notification-weekly-digest-border: oklch(0.35 0.12 142);
+
+  /* Risk Level Colors */
+  --risk-low-bg: oklch(0.25 0.08 142);
+  --risk-low-text: oklch(0.75 0.12 142);
+  --risk-low-border: oklch(0.35 0.12 142);
+  --risk-low-solid: oklch(0.488 0.243 142);
+  --risk-medium-bg: oklch(0.25 0.08 70);
+  --risk-medium-text: oklch(0.75 0.12 70);
+  --risk-medium-border: oklch(0.35 0.12 70);
+  --risk-medium-solid: oklch(0.769 0.188 70.08);
+  --risk-high-bg: oklch(0.25 0.08 27.325);
+  --risk-high-text: oklch(0.75 0.12 27.325);
+  --risk-high-border: oklch(0.35 0.12 27.325);
+  --risk-high-solid: oklch(0.704 0.191 22.216);
+
+  /* Progress Bar Colors */
+  --progress-normal: oklch(0.488 0.243 142);
+  --progress-warning: oklch(0.769 0.188 70.08);
+  --progress-danger: oklch(0.704 0.191 22.216);
 }
 
 @theme inline {
-  --font-sans: 'Roboto Slab', 'Roboto Slab Fallback';
-  --font-mono: 'Roboto Mono', 'Roboto Mono Fallback';
+  --font-sans: "Roboto Slab", "Roboto Slab Fallback";
+  --font-mono: "Roboto Mono", "Roboto Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -128,15 +370,34 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-serif: 'Roboto', 'Roboto Fallback';
+  --font-serif: "Roboto", "Roboto Fallback";
   /* computed shadow variables below - do not modify */
-  --shadow-2xs: var(--shadow-x) var(--shadow-y) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-xs: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-sm: var(--shadow-x) var(--shadow-y) calc(var(--shadow-blur) * 1.5) var(--shadow-spread) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), var(--shadow-x) var(--shadow-y) var(--shadow-blur) calc(var(--shadow-spread) - 1px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-md: calc(var(--shadow-x) * 2) calc(var(--shadow-y) * 2) calc(var(--shadow-blur) * 3) calc(var(--shadow-spread) - 1px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), var(--shadow-x) var(--shadow-y) calc(max(0px, var(--shadow-blur) * 2 - 2px)) calc(var(--shadow-spread) - 2px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-lg: calc(var(--shadow-x) * 4) calc(var(--shadow-y) * 4) calc(var(--shadow-blur) * 5) calc(var(--shadow-spread) - 3px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), calc(var(--shadow-x) * 2) calc(var(--shadow-y) * 2) calc(max(0px, var(--shadow-blur) * 3 - 4px)) calc(var(--shadow-spread) - 4px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-xl: calc(var(--shadow-x) * 6) calc(var(--shadow-y) * 6) calc(var(--shadow-blur) * 7) calc(var(--shadow-spread) - 5px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), calc(var(--shadow-x) * 4) calc(var(--shadow-y) * 4) calc(max(0px, var(--shadow-blur) * 5 - 6px)) calc(var(--shadow-spread) - 6px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-2xl: calc(var(--shadow-x) * 8) calc(var(--shadow-y) * 8) calc(max(0px, var(--shadow-blur) * 9 - 8px)) calc(var(--shadow-spread) - 12px) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 250%), transparent);
+  --shadow-2xs: var(--shadow-x) var(--shadow-y)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+  --shadow-xs: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+  --shadow-sm: var(--shadow-x) var(--shadow-y) calc(var(--shadow-blur) * 1.5) var(--shadow-spread)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), var(--shadow-x)
+    var(--shadow-y) var(--shadow-blur) calc(var(--shadow-spread) - 1px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+  --shadow-md: calc(var(--shadow-x) * 2) calc(var(--shadow-y) * 2) calc(var(--shadow-blur) * 3)
+    calc(var(--shadow-spread) - 1px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), var(--shadow-x)
+    var(--shadow-y) calc(max(0px, var(--shadow-blur) * 2 - 2px)) calc(var(--shadow-spread) - 2px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+  --shadow-lg: calc(var(--shadow-x) * 4) calc(var(--shadow-y) * 4) calc(var(--shadow-blur) * 5)
+    calc(var(--shadow-spread) - 3px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), calc(var(--shadow-x) * 2)
+    calc(var(--shadow-y) * 2) calc(max(0px, var(--shadow-blur) * 3 - 4px)) calc(var(--shadow-spread) - 4px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+  --shadow-xl: calc(var(--shadow-x) * 6) calc(var(--shadow-y) * 6) calc(var(--shadow-blur) * 7)
+    calc(var(--shadow-spread) - 5px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), calc(var(--shadow-x) * 4)
+    calc(var(--shadow-y) * 4) calc(max(0px, var(--shadow-blur) * 5 - 6px)) calc(var(--shadow-spread) - 6px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
+  --shadow-2xl: calc(var(--shadow-x) * 8) calc(var(--shadow-y) * 8) calc(max(0px, var(--shadow-blur) * 9 - 8px))
+    calc(var(--shadow-spread) - 12px)
+    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 250%), transparent);
   --shadow: var(--shadow-md);
   --color-shadow-color: var(--shadow-color);
   --shadow-opacity: var(--shadow-opacity);
@@ -144,6 +405,119 @@
   --shadow-blur: var(--shadow-blur);
   --shadow-y: var(--shadow-y);
   --shadow-x: var(--shadow-x);
+
+  /* Status color utilities */
+  --color-priority-p0-bg: var(--priority-p0-bg);
+  --color-priority-p0-text: var(--priority-p0-text);
+  --color-priority-p0-border: var(--priority-p0-border);
+  --color-priority-p1-bg: var(--priority-p1-bg);
+  --color-priority-p1-text: var(--priority-p1-text);
+  --color-priority-p1-border: var(--priority-p1-border);
+  --color-priority-p2-bg: var(--priority-p2-bg);
+  --color-priority-p2-text: var(--priority-p2-text);
+  --color-priority-p2-border: var(--priority-p2-border);
+  --color-priority-p3-bg: var(--priority-p3-bg);
+  --color-priority-p3-text: var(--priority-p3-text);
+  --color-priority-p3-border: var(--priority-p3-border);
+  --color-priority-p4-bg: var(--priority-p4-bg);
+  --color-priority-p4-text: var(--priority-p4-text);
+  --color-priority-p4-border: var(--priority-p4-border);
+  --color-priority-p5-bg: var(--priority-p5-bg);
+  --color-priority-p5-text: var(--priority-p5-text);
+  --color-priority-p5-border: var(--priority-p5-border);
+
+  --color-status-todo-bg: var(--status-todo-bg);
+  --color-status-todo-text: var(--status-todo-text);
+  --color-status-todo-border: var(--status-todo-border);
+  --color-status-todo-dot: var(--status-todo-dot);
+  --color-status-in-progress-bg: var(--status-in-progress-bg);
+  --color-status-in-progress-text: var(--status-in-progress-text);
+  --color-status-in-progress-border: var(--status-in-progress-border);
+  --color-status-in-progress-dot: var(--status-in-progress-dot);
+  --color-status-in-review-bg: var(--status-in-review-bg);
+  --color-status-in-review-text: var(--status-in-review-text);
+  --color-status-in-review-border: var(--status-in-review-border);
+  --color-status-in-review-dot: var(--status-in-review-dot);
+  --color-status-done-bg: var(--status-done-bg);
+  --color-status-done-text: var(--status-done-text);
+  --color-status-done-border: var(--status-done-border);
+  --color-status-done-dot: var(--status-done-dot);
+
+  --color-health-healthy-bg: var(--health-healthy-bg);
+  --color-health-healthy-text: var(--health-healthy-text);
+  --color-health-healthy-border: var(--health-healthy-border);
+  --color-health-at-risk-bg: var(--health-at-risk-bg);
+  --color-health-at-risk-text: var(--health-at-risk-text);
+  --color-health-at-risk-border: var(--health-at-risk-border);
+  --color-health-blocked-bg: var(--health-blocked-bg);
+  --color-health-blocked-text: var(--health-blocked-text);
+  --color-health-blocked-border: var(--health-blocked-border);
+
+  --color-impact-critical-bg: var(--impact-critical-bg);
+  --color-impact-critical-text: var(--impact-critical-text);
+  --color-impact-critical-border: var(--impact-critical-border);
+  --color-impact-high-bg: var(--impact-high-bg);
+  --color-impact-high-text: var(--impact-high-text);
+  --color-impact-high-border: var(--impact-high-border);
+  --color-impact-medium-bg: var(--impact-medium-bg);
+  --color-impact-medium-text: var(--impact-medium-text);
+  --color-impact-medium-border: var(--impact-medium-border);
+  --color-impact-low-bg: var(--impact-low-bg);
+  --color-impact-low-text: var(--impact-low-text);
+  --color-impact-low-border: var(--impact-low-border);
+
+  --color-sprint-active-bg: var(--sprint-active-bg);
+  --color-sprint-active-text: var(--sprint-active-text);
+  --color-sprint-active-border: var(--sprint-active-border);
+  --color-sprint-planned-bg: var(--sprint-planned-bg);
+  --color-sprint-planned-text: var(--sprint-planned-text);
+  --color-sprint-planned-border: var(--sprint-planned-border);
+  --color-sprint-completed-bg: var(--sprint-completed-bg);
+  --color-sprint-completed-text: var(--sprint-completed-text);
+  --color-sprint-completed-border: var(--sprint-completed-border);
+
+  --color-capacity-overloaded-bg: var(--capacity-overloaded-bg);
+  --color-capacity-overloaded-text: var(--capacity-overloaded-text);
+  --color-capacity-overloaded-border: var(--capacity-overloaded-border);
+  --color-capacity-at-capacity-bg: var(--capacity-at-capacity-bg);
+  --color-capacity-at-capacity-text: var(--capacity-at-capacity-text);
+  --color-capacity-at-capacity-border: var(--capacity-at-capacity-border);
+  --color-capacity-optimal-bg: var(--capacity-optimal-bg);
+  --color-capacity-optimal-text: var(--capacity-optimal-text);
+  --color-capacity-optimal-border: var(--capacity-optimal-border);
+  --color-capacity-underutilized-bg: var(--capacity-underutilized-bg);
+  --color-capacity-underutilized-text: var(--capacity-underutilized-text);
+  --color-capacity-underutilized-border: var(--capacity-underutilized-border);
+
+  --color-notification-blocker-bg: var(--notification-blocker-bg);
+  --color-notification-blocker-text: var(--notification-blocker-text);
+  --color-notification-blocker-border: var(--notification-blocker-border);
+  --color-notification-capacity-bg: var(--notification-capacity-bg);
+  --color-notification-capacity-text: var(--notification-capacity-text);
+  --color-notification-capacity-border: var(--notification-capacity-border);
+  --color-notification-cross-team-bg: var(--notification-cross-team-bg);
+  --color-notification-cross-team-text: var(--notification-cross-team-text);
+  --color-notification-cross-team-border: var(--notification-cross-team-border);
+  --color-notification-weekly-digest-bg: var(--notification-weekly-digest-bg);
+  --color-notification-weekly-digest-text: var(--notification-weekly-digest-text);
+  --color-notification-weekly-digest-border: var(--notification-weekly-digest-border);
+
+  --color-risk-low-bg: var(--risk-low-bg);
+  --color-risk-low-text: var(--risk-low-text);
+  --color-risk-low-border: var(--risk-low-border);
+  --color-risk-low-solid: var(--risk-low-solid);
+  --color-risk-medium-bg: var(--risk-medium-bg);
+  --color-risk-medium-text: var(--risk-medium-text);
+  --color-risk-medium-border: var(--risk-medium-border);
+  --color-risk-medium-solid: var(--risk-medium-solid);
+  --color-risk-high-bg: var(--risk-high-bg);
+  --color-risk-high-text: var(--risk-high-text);
+  --color-risk-high-border: var(--risk-high-border);
+  --color-risk-high-solid: var(--risk-high-solid);
+
+  --color-progress-normal: var(--progress-normal);
+  --color-progress-warning: var(--progress-warning);
+  --color-progress-danger: var(--progress-danger);
 }
 
 @layer base {

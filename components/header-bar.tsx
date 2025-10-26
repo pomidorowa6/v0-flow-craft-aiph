@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarOpenIcon, SidebarCloseIcon } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { NotificationBell } from "@/components/notification-bell"
 import type { ViewType, Notification } from "@/types"
 
@@ -23,9 +22,10 @@ const viewLabels: Record<ViewType, string> = {
   "current-sprint": "Current Sprint",
   sprints: "Sprints",
   management: "Management Dashboard",
-  people: "People & Capacity",
+  "team-capacity": "Team Capacity Dashboard", // Updated title to "Team Capacity Dashboard"
   dependencies: "Dependencies",
-  analytics: "Analytics",
+  analytics: "Portfolio Overview",
+  reports: "Reports",
 }
 
 export function HeaderBar({
@@ -58,7 +58,6 @@ export function HeaderBar({
           onDismiss={onDismiss}
           onMarkAllAsRead={onMarkAllAsRead}
         />
-        <ThemeToggle />
       </div>
     </header>
   )

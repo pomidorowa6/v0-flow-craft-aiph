@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import {
@@ -20,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, Search, Edit, Trash2, Users, Calendar } from "lucide-react"
+import { Search, Edit, Trash2, Users, Calendar } from "lucide-react"
 import { EnhancedIssueForm } from "./enhanced-issue-form"
 import type { EnhancedIssue, Sprint, Team, TeamMember, Priority, IssueStatus, BusinessImpact } from "@/types"
 
@@ -119,11 +118,6 @@ export function EnhancedIssuesList({
       }
     })
 
-  const blockedIssuesCount = issues.filter((issue) => issue.status === "Blocked").length
-  const highImpactCount = issues.filter(
-    (issue) => issue.businessImpact === "Critical" || issue.businessImpact === "High",
-  ).length
-
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIssues(new Set(filteredAndSortedIssues.map((issue) => issue.id)))
@@ -176,537 +170,503 @@ export function EnhancedIssuesList({
   const getPriorityColor = (priority: Priority) => {
     switch (priority) {
       case "P0":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
+        return "bg-[var(--priority-p0-bg)] text-[var(--priority-p0-text)] border-[var(--priority-p0-border)]"
       case "P1":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
+        return "bg-[var(--priority-p1-bg)] text-[var(--priority-p1-text)] border-[var(--priority-p1-border)]"
       case "P2":
-        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-700"
+        return "bg-[var(--priority-p2-bg)] text-[var(--priority-p2-text)] border-[var(--priority-p2-border)]"
       case "P3":
-        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--priority-p3-bg)] text-[var(--priority-p3-text)] border-[var(--priority-p3-border)]"
       case "P4":
-        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--priority-p4-bg)] text-[var(--priority-p4-text)] border-[var(--priority-p4-border)]"
+      case "P5":
+        return "bg-[var(--priority-p5-bg)] text-[var(--priority-p5-text)] border-[var(--priority-p5-border)]"
       default:
-        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--priority-p3-bg)] text-[var(--priority-p3-text)] border-[var(--priority-p3-border)]"
     }
   }
 
   const getImpactColor = (impact: BusinessImpact) => {
     switch (impact) {
       case "Critical":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
+        return "bg-[var(--impact-critical-bg)] text-[var(--impact-critical-text)] border-[var(--impact-critical-border)]"
       case "High":
-        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-700"
+        return "bg-[var(--impact-high-bg)] text-[var(--impact-high-text)] border-[var(--impact-high-border)]"
       case "Medium":
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
+        return "bg-[var(--impact-medium-bg)] text-[var(--impact-medium-text)] border-[var(--impact-medium-border)]"
       case "Low":
-        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--impact-low-bg)] text-[var(--impact-low-text)] border-[var(--impact-low-border)]"
       default:
-        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--impact-low-bg)] text-[var(--impact-low-text)] border-[var(--impact-low-border)]"
     }
   }
 
   const getStatusColor = (status: IssueStatus) => {
     switch (status) {
       case "Todo":
-        return "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--status-todo-dot)]"
       case "In Progress":
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
+        return "bg-[var(--status-in-progress-dot)]"
       case "In Review":
-        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-700"
+        return "bg-[var(--status-in-review-dot)]"
       case "Done":
-        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
+        return "bg-[var(--status-done-dot)]"
       case "Blocked":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
+        return "bg-[var(--health-blocked-text)]"
       default:
-        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+        return "bg-[var(--status-todo-dot)]"
     }
   }
 
   return (
-    <div className="h-full w-full flex flex-col space-y-4">
-      {/* === STATISTICS OVERVIEW === */}
-      {/* Summary cards showing key metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-5 py-4 border-b border-none gap-4 flex-shrink-0">
-        <div className="text-center">
-          <div className="text-2xl font-bold">{issues.length}</div>
-          <div className="text-muted-foreground text-sm">Total Issues</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-red-600">{blockedIssuesCount}</div>
-          <div className="text-muted-foreground text-sm">Blocked Issues</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-amber-600">{highImpactCount}</div>
-          <div className="text-muted-foreground text-sm">High Impact</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">
-            {issues.filter((issue) => issue.status === "Done").length}
-          </div>
-          <div className="text-muted-foreground text-sm">Completed</div>
-        </div>
-        <div className="flex items-center space-x-2 text-right flex-row justify-end">
-          <EnhancedIssueForm
-            sprints={sprints}
-            teams={teams}
-            teamMembers={teamMembers}
-            onSubmit={onCreateIssue}
-            onCancel={() => {}}
-            trigger={
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Issue
-              </Button>
-            }
-          />
-        </div>
-      </div>
-
+    <>
       {/* === ISSUES TABLE === */}
       {/* Main data table with integrated filters and sticky header */}
-      <div className="flex-1 min-h-0 border border-border rounded-lg relative overflow-hidden">
-        <div ref={scrollContainerRef} className="h-full overflow-auto">
-          <Table>
-            <TableHeader
-              className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm"
-              style={{
-                borderBottom: "1px solid hsl(var(--border))",
-                position: "sticky",
-                top: 0,
-              }}
-            >
-              <TableRow className="bg-background/95 backdrop-blur-sm">
-                <TableHead
-                  className="w-12 bg-background/95 backdrop-blur-sm px-4 py-0"
-                  style={{
-                    position: "sticky",
-                    left: 0,
-                    zIndex: 60,
-                    width: "48px",
-                    minWidth: "48px",
-                    maxWidth: "48px",
-                  }}
-                >
-                  <Checkbox
-                    checked={
-                      selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0
-                    }
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all issues"
-                  />
-                </TableHead>
+      <div ref={scrollContainerRef} className="h-full overflow-auto">
+        <Table>
+          <TableHeader
+            className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm"
+            style={{
+              borderBottom: "1px solid hsl(var(--border))",
+              position: "sticky",
+              top: 0,
+            }}
+          >
+            <TableRow className="bg-background/95 backdrop-blur-sm">
+              <TableHead
+                className="w-12 bg-background/95 backdrop-blur-sm px-4 py-0"
+                style={{
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 60,
+                  width: "48px",
+                  minWidth: "48px",
+                  maxWidth: "48px",
+                }}
+              >
+                <Checkbox
+                  checked={selectedIssues.size === filteredAndSortedIssues.length && filteredAndSortedIssues.length > 0}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all issues"
+                />
+              </TableHead>
 
-                <TableHead
-                  className="min-w-[200px] bg-background/95 backdrop-blur-sm px-4 py-0"
-                  style={{
-                    position: "sticky",
-                    left: "48px",
-                    zIndex: 60,
-                    width: "300px",
-                    minWidth: "300px",
-                    maxWidth: "300px",
-                    boxShadow: isScrolled ? "2px 0 0 0 hsl(var(--border))" : "none",
-                  }}
-                >
-                  <div className="flex items-center space-x-2">
-                    <div className="relative flex-1 min-w-[150px]">
-                      <Input
-                        placeholder="Issue"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-7 h-8 text-xs font-medium border-none bg-transparent hover:bg-muted/50 focus:bg-background"
-                        aria-label="Search issues"
-                      />
-                      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-                    </div>
+              <TableHead
+                className="min-w-[200px] bg-background/95 backdrop-blur-sm px-4 py-0"
+                style={{
+                  position: "sticky",
+                  left: "48px",
+                  zIndex: 60,
+                  width: "300px",
+                  minWidth: "300px",
+                  maxWidth: "300px",
+                  boxShadow: isScrolled ? "2px 0 0 0 hsl(var(--border))" : "none",
+                }}
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="relative flex-1 min-w-[150px]">
+                    <Input
+                      placeholder="Issue"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-7 h-8 text-xs font-medium border-none bg-transparent hover:bg-muted/50 focus:bg-background"
+                      aria-label="Search issues"
+                    />
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                   </div>
-                </TableHead>
+                </div>
+              </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by priority"
-                    >
-                      <div className="flex items-center">
-                        <span>Priority</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Priority</SelectItem>
-                      <SelectItem value="P0">P0 - Critical</SelectItem>
-                      <SelectItem value="P1">P1 - High</SelectItem>
-                      <SelectItem value="P2">P2 - Medium</SelectItem>
-                      <SelectItem value="P3">P3 - Low</SelectItem>
-                      <SelectItem value="P4">P4 - Lowest</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-
-                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by status"
-                    >
-                      <div className="flex items-center">
-                        <span>Status</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="Todo">Todo</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="In Review">In Review</SelectItem>
-                      <SelectItem value="Done">Done</SelectItem>
-                      <SelectItem value="Blocked">Blocked</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
-
-                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <Select
-                    value={businessImpactFilter}
-                    onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
+              <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
+                <Select value={priorityFilter} onValueChange={(value: Priority | "all") => setPriorityFilter(value)}>
+                  <SelectTrigger
+                    className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                    aria-label="Filter by priority"
                   >
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by business impact"
-                    >
-                      <div className="flex items-center">
-                        <span>Impact</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Impact</SelectItem>
-                      <SelectItem value="Critical">Critical</SelectItem>
-                      <SelectItem value="High">High</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="Low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableHead>
+                    <div className="flex items-center">
+                      <span>Priority</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priority</SelectItem>
+                    <SelectItem value="P0">P0 - Critical</SelectItem>
+                    <SelectItem value="P1">P1 - High</SelectItem>
+                    <SelectItem value="P2">P2 - Medium</SelectItem>
+                    <SelectItem value="P3">P3 - Low</SelectItem>
+                    <SelectItem value="P4">P4 - Lowest</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableHead>
 
-                <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <Select value={teamFilter} onValueChange={setTeamFilter}>
-                    <SelectTrigger
-                      className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
-                      aria-label="Filter by team"
-                    >
-                      <div className="flex items-center">
-                        <span>Team</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Teams</SelectItem>
-                      {teams.map((team) => (
-                        <SelectItem key={team.id} value={team.id}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableHead>
+              <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
+                <Select value={statusFilter} onValueChange={(value: IssueStatus | "all") => setStatusFilter(value)}>
+                  <SelectTrigger
+                    className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                    aria-label="Filter by status"
+                  >
+                    <div className="flex items-center">
+                      <span>Status</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="Todo">Todo</SelectItem>
+                    <SelectItem value="In Progress">In Progress</SelectItem>
+                    <SelectItem value="In Review">In Review</SelectItem>
+                    <SelectItem value="Done">Done</SelectItem>
+                    <SelectItem value="Blocked">Blocked</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableHead>
 
-                <TableHead className="bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <span className="text-xs font-medium text-foreground">Sprint</span>
-                </TableHead>
+              <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
+                <Select
+                  value={businessImpactFilter}
+                  onValueChange={(value: BusinessImpact | "all") => setBusinessImpactFilter(value)}
+                >
+                  <SelectTrigger
+                    className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                    aria-label="Filter by business impact"
+                  >
+                    <div className="flex items-center">
+                      <span>Impact</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Impact</SelectItem>
+                    <SelectItem value="Critical">Critical</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="Low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableHead>
 
-                <TableHead className="bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <span className="text-xs font-medium text-foreground">Created</span>
-                </TableHead>
+              <TableHead className="min-w-[120px] bg-background/95 backdrop-blur-sm px-4 py-0">
+                <Select value={teamFilter} onValueChange={setTeamFilter}>
+                  <SelectTrigger
+                    className="h-8 border-none bg-transparent hover:bg-muted/50 text-xs font-medium"
+                    aria-label="Filter by team"
+                  >
+                    <div className="flex items-center">
+                      <span>Team</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Teams</SelectItem>
+                    {teams.map((team) => (
+                      <SelectItem key={team.id} value={team.id}>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableHead>
 
-                <TableHead className="w-20 bg-background/95 backdrop-blur-sm px-4 py-0">
-                  <span className="text-xs font-medium text-foreground">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+              <TableHead className="bg-background/95 backdrop-blur-sm px-4 py-0">
+                <span className="text-xs font-medium text-foreground">Sprint</span>
+              </TableHead>
 
-            <TableBody>
-              {filteredAndSortedIssues.map((issue) => {
-                const team = teams.find((t) => t.id === issue.teamId)
-                const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
-                const sprint = sprints.find((s) => s.id === issue.sprintId)
+              <TableHead className="bg-background/95 backdrop-blur-sm px-4 py-0">
+                <span className="text-xs font-medium text-foreground">Created</span>
+              </TableHead>
 
-                return (
-                  <TableRow key={issue.id} className="border-b border-border bg-background">
-                    <TableCell
-                      className="px-4 py-3 bg-background"
-                      style={{
-                        position: "sticky",
-                        left: 0,
-                        zIndex: 30,
-                        width: "48px",
-                        minWidth: "48px",
-                        maxWidth: "48px",
-                      }}
-                    >
-                      <Checkbox
-                        checked={selectedIssues.has(issue.id)}
-                        onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
-                        aria-label={`Select issue ${issue.title}`}
-                      />
-                    </TableCell>
+              <TableHead className="w-20 bg-background/95 backdrop-blur-sm px-4 py-0 text-right">
+                <span className="text-xs font-medium text-foreground">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
 
-                    <TableCell
-                      className="px-4 py-3 bg-background"
-                      style={{
-                        position: "sticky",
-                        left: "48px",
-                        zIndex: 30,
-                        width: "300px",
-                        minWidth: "300px",
-                        maxWidth: "300px",
-                        boxShadow: isScrolled ? "2px 0 0 0 hsl(var(--border))" : "none",
-                      }}
-                    >
-                      <div>
-                        <div className="font-medium">{issue.title}</div>
-                        <div className="text-sm text-muted-foreground">{issue.id}</div>
-                        {issue.status === "Blocked" && (
-                          <Badge className={getStatusColor("Blocked")} variant="outline">
-                            Blocked
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
+          <TableBody>
+            {filteredAndSortedIssues.map((issue) => {
+              const team = teams.find((t) => t.id === issue.teamId)
+              const assignee = teamMembers.find((m) => m.id === issue.assigneeId)
+              const sprint = sprints.find((s) => s.id === issue.sprintId)
 
-                    <TableCell className="px-4 py-3 bg-background">
-                      <Badge className={getPriorityColor(issue.priority)} variant="outline">
-                        {issue.priority}
-                      </Badge>
-                    </TableCell>
+              return (
+                <TableRow key={issue.id} className="border-b border-border bg-background">
+                  <TableCell
+                    className="px-4 py-3 bg-background"
+                    style={{
+                      position: "sticky",
+                      left: 0,
+                      zIndex: 30,
+                      width: "48px",
+                      minWidth: "48px",
+                      maxWidth: "48px",
+                    }}
+                  >
+                    <Checkbox
+                      checked={selectedIssues.has(issue.id)}
+                      onCheckedChange={(checked) => handleSelectIssue(issue.id, checked as boolean)}
+                      aria-label={`Select issue ${issue.title}`}
+                    />
+                  </TableCell>
 
-                    <TableCell className="px-4 py-3 bg-background">
-                      <Badge className={getStatusColor(issue.status)} variant="outline">
-                        {issue.status}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 bg-background">
-                      <Badge className={getImpactColor(issue.businessImpact)} variant="outline">
-                        {issue.businessImpact}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 bg-background">
-                      <div>
-                        <div className="font-medium">{team?.name || "Unassigned"}</div>
-                        <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 bg-background">
-                      {sprint ? (
-                        <div>
-                          <div className="font-medium">Sprint {sprint.no}</div>
-                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
+                  <TableCell
+                    className="px-4 py-3 bg-background"
+                    style={{
+                      position: "sticky",
+                      left: "48px",
+                      zIndex: 30,
+                      width: "300px",
+                      minWidth: "300px",
+                      maxWidth: "300px",
+                      boxShadow: isScrolled ? "2px 0 0 0 hsl(var(--border))" : "none",
+                    }}
+                  >
+                    <div>
+                      <div className="font-medium">{issue.title}</div>
+                      <div className="text-sm text-muted-foreground">{issue.id}</div>
+                      {issue.status === "Blocked" && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-2 h-2 rounded-full bg-[var(--health-blocked-text)]"></div>
+                          <span className="text-xs">Blocked</span>
                         </div>
-                      ) : (
-                        "No Sprint"
                       )}
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 bg-background">
-                      {new Date(issue.createdAt).toLocaleDateString()}
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 bg-background">
-                      <div className="flex space-x-1">
-                        <EnhancedIssueForm
-                          issue={issue}
-                          sprints={sprints}
-                          teams={teams}
-                          teamMembers={teamMembers}
-                          onSubmit={onEditIssue}
-                          onCancel={() => {}}
-                          trigger={
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              aria-label={`Edit issue ${issue.title}`}
-                            >
-                              <Edit className="h-3 w-3 text-foreground" />
-                            </Button>
-                          }
-                        />
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              aria-label={`Delete issue ${issue.title}`}
-                            >
-                              <Trash2 className="h-3 w-3 text-foreground" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. Are you sure you want to delete "{issue.title}"?
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => onDeleteIssue(issue.id)} variant="outline">
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* BULK OPERATIONS BAR */}
-        {selectedIssues.size > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-2 border-t bg-background/95 backdrop-blur-sm z-30">
-            <span className="text-sm font-medium text-foreground">
-              {selectedIssues.size} issue{selectedIssues.size !== 1 ? "s" : ""} selected
-            </span>
-            <div className="flex items-center space-x-2">
-              <Dialog open={assignSprintModalOpen} onOpenChange={setAssignSprintModalOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    Assign Sprint
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
-                    <DialogTitle className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Assign to Sprint
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="max-h-80 overflow-y-auto">
-                    <div className="space-y-2">
-                      {sprints.map((sprint) => (
-                        <div
-                          key={sprint.id}
-                          className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
-                            selectedSprintId === sprint.id ? "bg-primary/10 border-primary" : ""
-                          }`}
-                          onClick={() => setSelectedSprintId(sprint.id)}
-                        >
-                          <div className="font-medium">Sprint {sprint.no}</div>
-                          <div className="text-sm text-muted-foreground">{sprint.title}</div>
-                        </div>
-                      ))}
                     </div>
-                  </div>
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button variant="outline" onClick={() => setAssignSprintModalOpen(false)} size="sm">
-                      Cancel
-                    </Button>
-                    <Button onClick={handleBulkAssignSprint} disabled={!selectedSprintId} size="sm">
-                      Assign
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </TableCell>
 
-              <Dialog open={assignPersonModalOpen} onOpenChange={setAssignPersonModalOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
-                    <Users className="h-3 w-3 mr-1" />
-                    Assign Person
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
-                    <DialogTitle className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      Assign to Person
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="max-h-80 overflow-y-auto">
-                    <div className="space-y-2">
-                      {teamMembers.map((member) => {
-                        const memberTeam = teams.find((t) => t.id === member.teamId)
-                        return (
-                          <div
-                            key={member.id}
-                            className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 flex items-center space-x-3 ${
-                              selectedPersonId === member.id ? "bg-primary/10 border-primary" : ""
-                            }`}
-                            onClick={() => setSelectedPersonId(member.id)}
+                  <TableCell className="px-4 py-3 bg-background">
+                    <span
+                      className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 w-fit whitespace-nowrap shrink-0 gap-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border text-xs font-medium ${getPriorityColor(issue.priority)}`}
+                    >
+                      {issue.priority}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 bg-background">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${getStatusColor(issue.status)}`}></div>
+                      <span className="text-xs">{issue.status}</span>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 bg-background">
+                    <span
+                      className={`inline-flex items-center justify-center rounded-md px-2 py-0.5 w-fit whitespace-nowrap shrink-0 gap-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border text-xs font-medium ${getImpactColor(issue.businessImpact)}`}
+                    >
+                      {issue.businessImpact}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 bg-background">
+                    <div>
+                      <div className="font-medium">{team?.name || "Unassigned"}</div>
+                      <div className="text-sm text-muted-foreground">{assignee?.name || "Unassigned"}</div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 bg-background">
+                    {sprint ? (
+                      <div>
+                        <div className="font-medium">Sprint {sprint.no}</div>
+                        <div className="text-sm text-muted-foreground">{sprint.title}</div>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Backlog</span>
+                    )}
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 bg-background">
+                    {new Date(issue.createdAt).toLocaleDateString()}
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3 bg-background">
+                    <div className="flex space-x-1">
+                      <EnhancedIssueForm
+                        issue={issue}
+                        sprints={sprints}
+                        teams={teams}
+                        teamMembers={teamMembers}
+                        onSubmit={onEditIssue}
+                        onCancel={() => {}}
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            aria-label={`Edit issue ${issue.title}`}
                           >
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={member.avatar || "/placeholder.svg"} />
-                              <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{member.name}</div>
-                              <div className="text-sm text-muted-foreground">{memberTeam?.name || "No Team"}</div>
-                            </div>
-                          </div>
-                        )
-                      })}
+                            <Edit className="h-3 w-3 text-foreground" />
+                          </Button>
+                        }
+                      />
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            aria-label={`Delete issue ${issue.title}`}
+                          >
+                            <Trash2 className="h-3 w-3 text-foreground" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. Are you sure you want to delete "{issue.title}"?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => onDeleteIssue(issue.id)} variant="outline">
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
-                  </div>
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button variant="outline" onClick={() => setAssignPersonModalOpen(false)} size="sm">
-                      Cancel
-                    </Button>
-                    <Button onClick={handleBulkAssignPerson} disabled={!selectedPersonId} size="sm">
-                      Assign
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 text-xs ml-auto bg-transparent"
-                    disabled={selectedIssues.size === 0}
-                  >
-                    <Trash2 className="h-3 w-3 mr-1" />
-                    Delete Selected ({selectedIssues.size})
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Multiple Issues</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      You are about to delete {selectedIssues.size} issues. This action cannot be undone.
-                      <div className="mt-2 p-2 bg-muted rounded text-sm">
-                        <strong>Issues to delete:</strong>
-                        <ul className="mt-1 list-disc pl-4">
-                          {Array.from(selectedIssues)
-                            .slice(0, 3)
-                            .map((issueId) => {
-                              const issue = issues.find((i) => i.id === issueId)
-                              return issue ? <li key={issue.id}>{issue.title}</li> : null
-                            })}
-                          {selectedIssues.size > 3 && <li>...and {selectedIssues.size - 3} more</li>}
-                        </ul>
-                      </div>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogAction>Cancel</AlertDialogAction>
-                    <AlertDialogCancel onClick={handleBulkDelete} variant="outline">
-                      Delete All
-                    </AlertDialogCancel>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
-        )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
+
+      {/* BULK OPERATIONS BAR */}
+      {selectedIssues.size > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-2 border-t bg-background/95 backdrop-blur-sm z-30">
+          <span className="text-sm font-medium text-foreground">
+            {selectedIssues.size} issue{selectedIssues.size !== 1 ? "s" : ""} selected
+          </span>
+          <div className="flex items-center space-x-2">
+            <Dialog open={assignSprintModalOpen} onOpenChange={setAssignSprintModalOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  Assign Sprint
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
+                  <DialogTitle className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Assign to Sprint
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="max-h-80 overflow-y-auto">
+                  <div className="space-y-2">
+                    {sprints.map((sprint) => (
+                      <div
+                        key={sprint.id}
+                        className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
+                          selectedSprintId === sprint.id ? "bg-primary/10 border-primary" : ""
+                        }`}
+                        onClick={() => setSelectedSprintId(sprint.id)}
+                      >
+                        <div className="font-medium">Sprint {sprint.no}</div>
+                        <div className="text-sm text-muted-foreground">{sprint.title}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2 pt-4 border-t">
+                  <Button variant="outline" onClick={() => setAssignSprintModalOpen(false)} size="sm">
+                    Cancel
+                  </Button>
+                  <Button onClick={handleBulkAssignSprint} disabled={!selectedSprintId} size="sm">
+                    Assign
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={assignPersonModalOpen} onOpenChange={setAssignPersonModalOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="h-8 text-xs bg-transparent">
+                  <Users className="h-3 w-3 mr-1" />
+                  Assign Person
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
+                  <DialogTitle className="flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    Assign to Person
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="max-h-80 overflow-y-auto">
+                  <div className="space-y-2">
+                    {teamMembers.map((member) => {
+                      const memberTeam = teams.find((t) => t.id === member.teamId)
+                      return (
+                        <div
+                          key={member.id}
+                          className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 flex items-center space-x-3 ${
+                            selectedPersonId === member.id ? "bg-primary/10 border-primary" : ""
+                          }`}
+                          onClick={() => setSelectedPersonId(member.id)}
+                        >
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={member.avatar || "/placeholder.svg"} />
+                            <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{member.name}</div>
+                            <div className="text-sm text-muted-foreground">{memberTeam?.name || "No Team"}</div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2 pt-4 border-t">
+                  <Button variant="outline" onClick={() => setAssignPersonModalOpen(false)} size="sm">
+                    Cancel
+                  </Button>
+                  <Button onClick={handleBulkAssignPerson} disabled={!selectedPersonId} size="sm">
+                    Assign
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs ml-auto bg-transparent"
+                  disabled={selectedIssues.size === 0}
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Delete Selected ({selectedIssues.size})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Multiple Issues</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You are about to delete {selectedIssues.size} issues. This action cannot be undone.
+                    <div className="mt-2 p-2 bg-muted rounded text-sm">
+                      <strong>Issues to delete:</strong>
+                      <ul className="mt-1 list-disc pl-4">
+                        {Array.from(selectedIssues)
+                          .slice(0, 3)
+                          .map((issueId) => {
+                            const issue = issues.find((i) => i.id === issueId)
+                            return issue ? <li key={issue.id}>{issue.title}</li> : null
+                          })}
+                        {selectedIssues.size > 3 && <li>...and {selectedIssues.size - 3} more</li>}
+                      </ul>
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>Cancel</AlertDialogAction>
+                  <AlertDialogCancel onClick={handleBulkDelete} variant="outline">
+                    Delete All
+                  </AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      )}
 
       {/* === EMPTY STATE === */}
       {/* Shown when no issues match current filters */}
@@ -715,6 +675,6 @@ export function EnhancedIssuesList({
           <p className="text-muted-foreground">No issues found matching your filters.</p>
         </div>
       )}
-    </div>
+    </>
   )
 }

@@ -106,4 +106,12 @@ export interface TeamMetrics {
   createdAt: Date
 }
 
-export type ViewType = "issues" | "current-sprint" | "sprints" | "management" | "people" | "dependencies" | "analytics"
+export type ViewType =
+  | "issues"
+  | "current-sprint"
+  | "sprints"
+  | "management"
+  | "team-capacity" // Renamed from "people" to "team-capacity"
+  | "dependencies"
+  | "analytics"
+  | "reports"

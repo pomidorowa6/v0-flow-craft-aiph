@@ -70,17 +70,7 @@ export function ManagementDashboard({ teams, teamMembers, issues, sprints }: Man
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Management Dashboard</h2>
-          <p className="text-muted-foreground">Overview of all teams and their current status</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Badge variant="outline" className="text-sm">
-            {activeSprint ? activeSprint.name : "No Active Sprint"}
-          </Badge>
-        </div>
-      </div>
+      
  {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>

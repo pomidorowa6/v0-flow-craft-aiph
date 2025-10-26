@@ -4,12 +4,11 @@ import { useState } from "react"
 import { Navigation } from "@/components/navigation"
 import { HeaderBar } from "@/components/header-bar"
 import { CurrentSprintView } from "@/components/current-sprint-view"
-import { SprintsView } from "@/components/sprints-view"
-import { ManagementDashboard } from "@/components/management-dashboard"
-import { EnhancedIssuesList } from "@/components/enhanced-issues-list"
-import { PeopleCapacityView } from "@/components/people-capacity-view"
+import { BacklogSprintsView } from "@/components/backlog-sprints-view"
+import { ManagementCapacityView } from "@/components/management-capacity-view"
 import { DependenciesView } from "@/components/dependencies-view"
 import AdvancedAnalytics from "@/components/advanced-analytics"
+import { ReportsView } from "@/components/reports-view"
 import { useNotifications } from "@/hooks/use-notifications"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -223,7 +222,7 @@ export default function TaskFlowApp() {
     switch (currentView) {
       case "issues":
         return (
-          <EnhancedIssuesList
+          <BacklogSprintsView
             issues={enhancedIssues}
             sprints={sprints}
             teams={teams}
@@ -231,6 +230,10 @@ export default function TaskFlowApp() {
             onCreateIssue={handleCreateEnhancedIssue}
             onEditIssue={handleEditEnhancedIssue}
             onDeleteIssue={handleDeleteEnhancedIssue}
+            onCreateSprint={handleCreateSprint}
+            onEditSprint={handleEditSprint}
+            onStartSprint={handleStartSprint}
+            onEndSprint={handleEndSprint}
           />
         )
       case "current-sprint":
@@ -241,25 +244,16 @@ export default function TaskFlowApp() {
             onUpdateIssueStatus={handleUpdateIssueStatus}
           />
         )
-      case "sprints":
+      case "team-capacity":
         return (
-          <SprintsView
-            sprints={sprints}
-            issues={issues}
-            onCreateSprint={handleCreateSprint}
-            onEditSprint={handleEditSprint}
-            onStartSprint={handleStartSprint}
-            onEndSprint={handleEndSprint}
-          />
+          <ManagementCapacityView teamMembers={teamMembers} teams={teams} issues={enhancedIssues} sprints={sprints} />
         )
-      case "management":
-        return <ManagementDashboard teams={teams} teamMembers={teamMembers} issues={enhancedIssues} sprints={sprints} />
-      case "people":
-        return <PeopleCapacityView teamMembers={teamMembers} teams={teams} issues={enhancedIssues} sprints={sprints} />
       case "dependencies":
         return <DependenciesView issues={enhancedIssues} teams={teams} teamMembers={teamMembers} sprints={sprints} />
       case "analytics":
         return <AdvancedAnalytics />
+      case "reports":
+        return <ReportsView />
       default:
         return null
     }

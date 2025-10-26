@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { List, Kanban, Calendar, BarChart3, Users, GitBranch, TrendingUp } from "lucide-react"
+import { List, Kanban, BarChart3, Users, GitBranch, TrendingUp, Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { ViewType, Issue, Sprint, Notification } from "@/types"
 import Image from "next/image"
+import { useTheme } from "@/contexts/theme-context"
 
 interface NavigationProps {
   currentView: ViewType
@@ -36,6 +37,7 @@ export function Navigation({
   onToggleExpanded,
   isMobile = false,
 }: NavigationProps) {
+  const { theme, toggleTheme } = useTheme()
   const activeSprint = sprints.find((sprint) => sprint.status === "Active")
   const activeSprintIssues = issues.filter((issue) => issue.sprintId === activeSprint?.id)
 
@@ -54,20 +56,8 @@ export function Navigation({
       disabled: !activeSprint,
     },
     {
-      id: "sprints" as ViewType,
-      label: "Sprints",
-      icon: Calendar,
-      count: sprints.length,
-    },
-    {
-      id: "management" as ViewType,
-      label: "Management",
-      icon: BarChart3,
-      count: 3,
-    },
-    {
-      id: "people" as ViewType,
-      label: "People",
+      id: "team-capacity" as ViewType,
+      label: "Team Capacity",
       icon: Users,
       count: 5,
     },
@@ -79,9 +69,15 @@ export function Navigation({
     },
     {
       id: "analytics" as ViewType,
-      label: "Analytics",
+      label: "Portfolio Overview",
       icon: TrendingUp,
       count: 4,
+    },
+    {
+      id: "reports" as ViewType,
+      label: "Reports",
+      icon: BarChart3,
+      count: 6,
     },
   ]
 
@@ -110,7 +106,7 @@ export function Navigation({
             </div>
           </div>
 
-          <div className="flex-1 py-4">
+          <div className="flex-1 py-4 px-0">
             <div className="space-y-2 text-left px-3">
               {navItems.map((item) => {
                 const Icon = item.icon
@@ -169,10 +165,48 @@ export function Navigation({
             </div>
           </div>
 
-          <div className="p-4 text-left px-4 py-4">
+          <div className="p-4 text-left px-4 py-4 space-y-2">
+            <div className="mb-4">
+              {!isMobile && !isExpanded ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleTheme}
+                      className="w-full justify-center h-10 px-3 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    >
+                      {theme === "light" ? (
+                        <Moon className="h-4 w-4 flex-shrink-0" />
+                      ) : (
+                        <Sun className="h-4 w-4 flex-shrink-0" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    {theme === "light" ? "Toggle Dark Mode" : "Toggle Light Mode"}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleTheme}
+                  className="w-full justify-start h-10 px-3 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                >
+                  {theme === "light" ? (
+                    <Moon className="h-4 w-4 flex-shrink-0" />
+                  ) : (
+                    <Sun className="h-4 w-4 flex-shrink-0" />
+                  )}
+                  <span className="ml-3 truncate">{theme === "light" ? "Toggle Dark Mode" : "Toggle Light Mode"}</span>
+                </Button>
+              )}
+            </div>
+
             <div
               className={cn(
-                "flex space-x-3 p-2 rounded-lg hover:bg-sidebar-accent/50 cursor-pointer py-0 px-0 text-left items-center",
+                "flex space-x-3 p-2 rounded-lg hover:bg-sidebar-accent/50 cursor-pointer py-0 px-0 text-left items-center my-0",
                 !isMobile && !isExpanded && "justify-center",
               )}
             >
